@@ -1,0 +1,122 @@
+@use '../abstracts' as ab
+@use '../utils' as ut
+
+form
+    .error
+        color: ab.$red-500
+        font-size: ab.$text-sm
+        margin-top: ab.$space-1
+
+.input-list
+    @include ab.flex($direction: column, $align: center, $gap: ab.$space-4)
+    width: 100%
+
+.label
+    @include ab.flex($gap: ab.$space-1)
+    color: ab.$neutral-800
+    font-size: ab.$text-sm
+
+    .required
+        color: ab.$red-500
+
+.input-container
+    @include ab.flex($direction: column, $gap: ab.$space-2)
+    width: 100%
+
+    &.input-text, &.input-select, &.input-password, &.input-textarea
+        .input
+            @include ab.flex($gap: ab.$space-1, $align: center)
+            width: 100%
+            padding: ab.$space-3
+            border: 1px solid ab.$neutral-300
+            border-radius: ab.$rounded-sm
+            background-color: ab.$neutral-100
+
+            .icon-container
+                @include ab.flex($justify: center, $align: center)
+
+                .icon
+                    width: ab.$space-5
+                    height: ab.$space-5
+                    color: ab.$neutral-500
+
+            input, select, textarea
+                height: 100%
+                flex-grow: 1
+                color: ab.$neutral-600
+                cursor: pointer
+
+                &::placeholder
+                    color: ab.$neutral-500
+
+            textarea
+                @include ab.hidden-scrollbar
+                border: none
+                resize: vertical
+
+                &:focus
+                    outline: none
+
+        &.disabled
+            .input
+                cursor: not-allowed
+
+                input, select, textarea
+                    cursor: not-allowed
+                    resize: none
+
+    &.input-checkbox
+        .input
+            @include ab.flex($gap: ab.$space-2, $align: center)
+
+        .circle
+            width: ab.$space-5
+            height: ab.$space-5
+            border: 1px solid ab.$neutral-700
+            border-radius: ab.$rounded-full
+            cursor: pointer
+
+        span
+            color: ab.$neutral-800
+            font-size: ab.$text-sm
+            cursor: pointer
+
+        &.checked
+            .circle
+                background-color: ab.$neutral-700
+    &.rounded
+        .input
+            border-radius: ab.$rounded-3xl
+            padding: ab.$space-3 ab.$space-4
+
+.submit-button
+    @include ab.flex($justify: center, $align: center)
+    @include ab.transition-all
+    width: 100%
+    padding: ab.$space-3
+    color: ab.$neutral-100
+    background-color: ab.$primary-300
+    border: 1px solid ab.$primary-600
+    border-radius: ab.$rounded-sm
+
+    &.rounded
+        border-radius: ab.$rounded-3xl
+
+    &:hover
+        background-color: darken(ab.$primary-300, 5%)
+
+.delete-button
+    @include ab.flex($justify: center, $align: center)
+    @include ab.transition-all
+    width: 100%
+    padding: ab.$space-3
+    color: ab.$neutral-100
+    background-color: ab.$red-500
+    border: 1px solid darken(ab.$red-500, 5%)
+    border-radius: ab.$rounded-sm
+
+    &.rounded
+        border-radius: ab.$rounded-3xl
+
+    &:hover
+        background-color: darken(ab.$red-500, 5%)

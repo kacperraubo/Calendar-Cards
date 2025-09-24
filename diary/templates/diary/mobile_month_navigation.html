@@ -1,0 +1,16 @@
+{% load icons %}
+
+<div class="mobile-month-navigation">
+    <button class="previous-month-button">
+        {% icon 'chevron-left' 'icon' %}
+    </button>
+    <div class="month">
+        {{ start_date|date:"F" }}
+    </div>
+    <div class="year">
+        {{ start_date|date:"Y" }}
+    </div>
+    <button class="next-month-button">
+        {% icon 'chevron-right' 'icon' %}
+    </button>
+</div>

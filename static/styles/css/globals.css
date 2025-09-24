@@ -1,0 +1,434 @@
+@import 'https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap';
+.layout {
+  width: 100%;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.not-allowed {
+  cursor: not-allowed !important;
+}
+
+.hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+form .error {
+  color: #EF1103;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.input-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.25rem;
+  flex-wrap: no-wrap;
+  color: #232B3C;
+  font-size: 0.875rem;
+}
+.label .required {
+  color: #EF1103;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+}
+.input-container.input-text .input, .input-container.input-select .input, .input-container.input-password .input, .input-container.input-textarea .input {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #CED4E1;
+  border-radius: 0.25rem;
+  background-color: #F0F2F5;
+}
+.input-container.input-text .input .icon-container, .input-container.input-select .input .icon-container, .input-container.input-password .input .icon-container, .input-container.input-textarea .input .icon-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+}
+.input-container.input-text .input .icon-container .icon, .input-container.input-select .input .icon-container .icon, .input-container.input-password .input .icon-container .icon, .input-container.input-textarea .input .icon-container .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #949FB6;
+}
+.input-container.input-text .input input, .input-container.input-text .input select, .input-container.input-text .input textarea, .input-container.input-select .input input, .input-container.input-select .input select, .input-container.input-select .input textarea, .input-container.input-password .input input, .input-container.input-password .input select, .input-container.input-password .input textarea, .input-container.input-textarea .input input, .input-container.input-textarea .input select, .input-container.input-textarea .input textarea {
+  height: 100%;
+  flex-grow: 1;
+  color: #5F6D8A;
+  cursor: pointer;
+}
+.input-container.input-text .input input::placeholder, .input-container.input-text .input select::placeholder, .input-container.input-text .input textarea::placeholder, .input-container.input-select .input input::placeholder, .input-container.input-select .input select::placeholder, .input-container.input-select .input textarea::placeholder, .input-container.input-password .input input::placeholder, .input-container.input-password .input select::placeholder, .input-container.input-password .input textarea::placeholder, .input-container.input-textarea .input input::placeholder, .input-container.input-textarea .input select::placeholder, .input-container.input-textarea .input textarea::placeholder {
+  color: #949FB6;
+}
+.input-container.input-text .input textarea, .input-container.input-select .input textarea, .input-container.input-password .input textarea, .input-container.input-textarea .input textarea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border: none;
+  resize: vertical;
+}
+.input-container.input-text .input textarea::-webkit-scrollbar, .input-container.input-select .input textarea::-webkit-scrollbar, .input-container.input-password .input textarea::-webkit-scrollbar, .input-container.input-textarea .input textarea::-webkit-scrollbar {
+  display: none;
+}
+.input-container.input-text .input textarea:focus, .input-container.input-select .input textarea:focus, .input-container.input-password .input textarea:focus, .input-container.input-textarea .input textarea:focus {
+  outline: none;
+}
+.input-container.input-text.disabled .input, .input-container.input-select.disabled .input, .input-container.input-password.disabled .input, .input-container.input-textarea.disabled .input {
+  cursor: not-allowed;
+}
+.input-container.input-text.disabled .input input, .input-container.input-text.disabled .input select, .input-container.input-text.disabled .input textarea, .input-container.input-select.disabled .input input, .input-container.input-select.disabled .input select, .input-container.input-select.disabled .input textarea, .input-container.input-password.disabled .input input, .input-container.input-password.disabled .input select, .input-container.input-password.disabled .input textarea, .input-container.input-textarea.disabled .input input, .input-container.input-textarea.disabled .input select, .input-container.input-textarea.disabled .input textarea {
+  cursor: not-allowed;
+  resize: none;
+}
+.input-container.input-checkbox .input {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: no-wrap;
+}
+.input-container.input-checkbox .circle {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #424E66;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.input-container.input-checkbox span {
+  color: #232B3C;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.input-container.input-checkbox.checked .circle {
+  background-color: #424E66;
+}
+.input-container.rounded .input {
+  border-radius: 2rem;
+  padding: 0.75rem 1rem;
+}
+
+.submit-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  transition: all 0.3s ease;
+  width: 100%;
+  padding: 0.75rem;
+  color: #F0F2F5;
+  background-color: #278BFF;
+  border: 1px solid #005ECB;
+  border-radius: 0.25rem;
+}
+.submit-button.rounded {
+  border-radius: 2rem;
+}
+.submit-button:hover {
+  background-color: #0e7dff;
+}
+
+.delete-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  transition: all 0.3s ease;
+  width: 100%;
+  padding: 0.75rem;
+  color: #F0F2F5;
+  background-color: #EF1103;
+  border: 1px solid #d60f03;
+  border-radius: 0.25rem;
+}
+.delete-button.rounded {
+  border-radius: 2rem;
+}
+.delete-button:hover {
+  background-color: #d60f03;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  padding: 1rem 0;
+  white-space: nowrap;
+  height: 5rem;
+}
+.header a {
+  text-decoration: none;
+}
+.header .hamburger {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: no-wrap;
+  position: relative;
+  cursor: pointer;
+  color: #424E66;
+  z-index: 2;
+}
+.header .hamburger .menu {
+  position: absolute;
+  top: 150%;
+  left: 0;
+  background-color: #FBFCFF;
+  border: 1px solid #CED4E1;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+.header .hamburger .menu .option {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: no-wrap;
+  padding: 0.25rem;
+  color: #5F6D8A;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 100%;
+}
+.header .hamburger .menu .option .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.header .hamburger .menu .option:hover {
+  background-color: #F0F2F5;
+}
+.header .options {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+}
+.header .display-modes {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+}
+.header .display-modes .single, .header .display-modes .multi, .header .display-modes .year {
+  cursor: pointer;
+  display: grid;
+  gap: 0.125rem;
+  aspect-ratio: 1;
+  height: 1.125rem;
+}
+.header .display-modes .single .rect, .header .display-modes .multi .rect, .header .display-modes .year .rect {
+  background-color: #93C5FF;
+  border-radius: 2px;
+}
+.header .display-modes .single.selected, .header .display-modes .multi.selected, .header .display-modes .year.selected {
+  height: 1.75rem;
+}
+.header .display-modes .single.selected .rect, .header .display-modes .multi.selected .rect, .header .display-modes .year.selected .rect {
+  background-color: #278BFF;
+}
+.header .display-modes .single {
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+}
+.header .display-modes .multi {
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+}
+.header .display-modes .year {
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.header .date {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: no-wrap;
+}
+.header .date .year, .header .date .month {
+  color: #424E66;
+}
+.header .date .month {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+.header .date .year {
+  font-size: 0.875rem;
+  margin-top: 0.125rem;
+}
+.header .date .move {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+}
+.header .date .move button {
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 0.25rem;
+  background-color: transparent;
+}
+.header .date .move button:hover {
+  background-color: #F0F2F5;
+}
+.header .date .move .icon {
+  color: #5F6D8A;
+}
+@media screen and (max-width: 750px) {
+  .header .date {
+    display: none;
+  }
+}
+
+.mobile-month-navigation {
+  display: none;
+  width: 100%;
+  color: #424E66;
+  padding-bottom: 1rem;
+}
+.mobile-month-navigation .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #5F6D8A;
+}
+.mobile-month-navigation .month {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+.mobile-month-navigation .year {
+  font-size: 0.875rem;
+  margin-bottom: 0.125rem;
+}
+@media screen and (max-width: 750px) {
+  .mobile-month-navigation {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: no-wrap;
+  }
+}
+
+.scroll-container {
+  overflow: auto;
+}
+
+.sections {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  width: fit-content;
+  overflow: auto;
+  color: #5F6D8A;
+  padding-bottom: 1.5rem;
+  margin: 0 auto;
+}
+.sections::-webkit-scrollbar {
+  display: none;
+}
+.sections .section {
+  font-size: 1.125rem;
+  white-space: nowrap;
+}
+.sections .section.selected {
+  color: #232B3C;
+  font-weight: 600;
+}
+
+.ellipsis_text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  font-family: "Source Sans 3", Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+}
+
+/*# sourceMappingURL=globals.css.map */

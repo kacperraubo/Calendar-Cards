@@ -1,0 +1,33 @@
+{% load icons %}
+
+<div class="scroll-container full-width hidden-scrollbar">
+    <div class="sections">
+        {% for section_ in user.sections.all %}
+            <div 
+                class="section {% if section_ == section %}selected{% endif %} pointer"
+                data-token="{{ section_.token }}"
+            >
+                <div class="section-name">
+                    {{ section_.name }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script type="module">
+    import { redirectWithExistingSearchParams } from '/static/scripts/utilities/urls.js';
+
+    const sections = document.querySelectorAll('.sections .section');
+
+    sections.forEach((section) => {
+        section.addEventListener('click', () => {
+            if (section.classList.contains('selected')) {
+                return;
+            }
+            
+            const token = section.dataset.token;
+            redirectWithExistingSearchParams(`/${token}`);
+        });
+    });
+</script>

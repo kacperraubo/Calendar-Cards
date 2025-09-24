@@ -1,0 +1,49 @@
+@use './abstracts' as ab
+@use './utils' as ut
+
+.invitations-container
+    @include ab.flex($direction: column)
+    width: 100%
+    min-height: 100vh
+    background-color: ab.$neutral-50
+    padding: 0 ab.$space-8 ab.$space-8 ab.$space-8
+
+    .invitations
+        @include ab.flex($direction: column, $gap: ab.$space-6)
+        width: 100%
+
+        .invitation
+            @include ab.flex($direction: column, $gap: ab.$space-4)
+            width: 100%
+            margin: 0 auto
+            padding: ab.$space-6
+            background-color: ab.$neutral-100
+            border-radius: ab.$rounded-md
+            border: 1px solid ab.$neutral-300
+
+            .invitation-details
+                @include ab.flex($direction: column, $gap: ab.$space-4)
+                color: ab.$neutral-700
+
+                .detail
+                    @include ab.flex($direction: column, $gap: ab.$space-1)
+
+                    .label
+                        color: ab.$neutral-600
+
+                .invitation-title
+                    font-size: ab.$text-lg
+                    font-weight: 600
+
+            .invitation-buttons
+                @include ab.flex($gap: ab.$space-4)
+                width: 100%
+
+                button
+                    width: 50%
+
+    .no-invitations
+        @include ab.flex($justify: center, $align: center)
+        font-size: ab.$text-2xl
+        color: ab.$neutral-700
+        margin: auto

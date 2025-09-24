@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">  
+    <input type="hidden" name="section-token" value="{{ section.token }}"> 
+
+    <div class="home-container">
+        {% include 'diary/header.html' with exclude_delete_section_button=True exclude_rename_section_button=True %}
+        {% include 'diary/mobile_month_navigation.html' %}
+
+        {% if display_mode == 'single' %}
+            <div class="single-mode">
+                <div class="day-label">Mon</div>
+                <div class="day-label">Tue</div>
+                <div class="day-label">Wed</div>
+                <div class="day-label">Thu</div>
+                <div class="day-label">Fri</div>
+                <div class="day-label weekend">Sat</div>
+                <div class="day-label weekend">Sun</div>
+
+                {% for day in days %}
+                    {% include 'diary/day_tile.html' with exclude_events=True expanded=True day=day %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                {% for month in months %}
+                    <div class="month">
+                        <div class="month-name">
+                            {{ month.name }}
+                        </div>
+                        
+                        <div class="month-grid">
+                            <div class="day-label">M</div>
+                            <div class="day-label">T</div>
+                            <div class="day-label">W</div>
+                            <div class="day-label">T</div>
+                            <div class="day-label">F</div>
+                            <div class="day-label weekend">S</div>
+                            <div class="day-label weekend">S</div>
+
+                            {% for day in month.days %}
+                                {% include 'diary/day_tile.html' with exclude_events=True expanded=False day=day %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="day-options hidden">
+            {% icon 'plus' 'icon' %}
+            <button class="add-event-button">Add event</button>
+
+            <div class="mobile-menu hidden">
+                <button class="add-event-button">Add event</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/externalSection/index.js' %}"></script>
+{% endblock %}

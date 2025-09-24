@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">     
+    <input type="hidden" name="section-token" value="{{ section.token }}">
+    <input type="hidden" name="event-token" value="{{ event.token }}">
+
+    <div class="create-event-container">
+        {% include 'diary/header.html' %}
+        {% include 'diary/mobile_month_navigation.html' %}
+        {% include 'diary/sections.html' %}
+
+        <div class="event-container">
+            <div class="form-container">
+                <div class="form">
+                    <div class="title">Manage Availability Event</div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="creator"
+                    >
+                        <div class="label">
+                            <label for="title">Creator</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="creator" 
+                                id="creator"
+                                value="{{ event.creator }}"
+                                required
+                                disabled
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="title"
+                    >
+                        <div class="label">
+                            <label for="title">Title</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="title" 
+                                id="title"
+                                placeholder="Event title" 
+                                value="{{ event.title }}"
+                                required
+                                disabled
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="description"
+                    >
+                        <div class="label">
+                            <label for="description">Description</label>
+                        </div>
+
+                        <div class="input">
+                            <textarea
+                                name="title" 
+                                id="title"
+                                placeholder="Event description"
+                                value="{{ event.description }}"
+                                disabled
+                            >{{ event.description }}</textarea>
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="address"
+                    >
+                        <div class="label">
+                            <label for="address">Address</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="address" 
+                                id="address"
+                                placeholder="Enter address" 
+                                disabled
+
+                                {% if event.meeting_location %}
+                                    value="{{ event.meeting_location }}"
+                                {% endif %}
+                            >
+                        </div>
+                    </div>
+
+                    <div class="label">
+                        Time
+                    </div>
+
+                    <div class="time-select not-allowed">
+                        <div class="from">None</div>
+                        <div class="divider">-</div>
+                        <div class="to">None</div>
+                        {% icon 'clock' 'icon' %}
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const existingStartTime = '{{ event.starting_time|time:"H:i" }}';
+                            const existingEndTime = '{{ event.ending_time|time:"H:i" }}';
+
+                            if (existingStartTime !== '') {
+                                const timeSelect = document.querySelector('.time-select');
+                                const from = timeSelect.querySelector('.from');
+                                const to = timeSelect.querySelector('.to');
+
+                                from.textContent = existingStartTime;
+                                to.textContent = existingEndTime;
+                            }
+                        });
+                    </script>
+
+                    <div 
+                        class="input-container input-select reminder-select"
+                        data-input-name="reminder"
+                    >
+                        <div class="label">
+                            <label for="reminder">Add Reminder</label>
+                        </div>
+    
+                        <div class="input">
+                            <select 
+                                name="reminder" 
+                                id="reminder" 
+                                required
+                            >            
+                                <option value="" selected disabled hidden>Add a reminder</option>                    
+                                {% for value, label in reminder_options %}
+                                    <option 
+                                        value="{{ value }}" 
+                                        data-label="{{ label }}"
+                                        {% if value in event.reminders %}class="hidden"{% endif %}
+                                    >{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reminders-list {% if not event.reminders|length %}hidden{% endif %}">
+                        {% for value, label in reminder_options %}
+                            {% if value in event.reminders %}
+                                <div class="reminder" data-value="{{ value }}">
+                                    {{ label }}
+                                    <div class="icon-container right pointer">
+                                        {% icon 'trash-2' 'icon' %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        import { getIcon } from '/static/scripts/utilities/icon.js';
+
+                        onDocumentLoad(() => {
+                            const reminderSelect = document.querySelector('.reminder-select select');
+                            const remindersList = document.querySelector('.reminders-list');
+                            let reminderCount = remindersList.querySelectorAll('.reminder').length;
+
+                            for (const reminder of remindersList.querySelectorAll('.reminder')) {
+                                const removeIcon = reminder.querySelector('.icon-container.right');
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    reminderSelect.querySelector(`option[value="${reminder.dataset.value}"]`).classList.remove('hidden');
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+                            }
+
+                            reminderSelect.addEventListener('input', async (event) => {
+                                const selectedOption = event.target.selectedOptions[0];
+                                const value = selectedOption.value;
+                                const label = selectedOption.dataset.label;
+                                
+                                selectedOption.classList.add('hidden');
+                                console.log(selectedOption);
+                                remindersList.classList.remove('hidden');
+
+                                if (remindersList.querySelector(`.reminder[data-value="${value}"]`)) {
+                                    return;
+                                }
+                                
+                                const reminder = document.createElement('div');
+                                reminder.classList.add('reminder');
+                                reminder.innerHTML = label
+                                reminder.dataset.value = value;
+
+                                const removeIcon = document.createElement('div');
+                                removeIcon.classList.add('icon-container', 'right', 'pointer');
+                                removeIcon.appendChild(await getIcon('trash-2', 'icon'));
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    selectedOption.classList.remove('hidden');
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+
+                                reminder.appendChild(removeIcon);
+                                remindersList.appendChild(reminder);
+
+                                reminderCount++;
+
+                                reminderSelect.selectedIndex = 0;
+                            });
+                        })
+                    </script>
+
+                    <button class="submit-button save-event-button" data-token="{{ event.token }}">
+                        Save
+                    </button>
+
+                    <button class="delete-button delete-event-button" data-token="{{ event.token }}">
+                        Delete Event
+                    </button>
+
+                    <script type="module">
+                        import { deleteAvailabilityEvent } from '/static/scripts/api/deleteAvailabilityEvent.js';
+
+                        document.querySelector('.delete-event-button').addEventListener('click', async (event) => {
+                            if (!confirm('Are you sure you want to delete this event?')) {
+                                return;
+                            }
+
+                            const token = event.target.dataset.token;
+
+                            const { success, payload, errorMessage } = await deleteAvailabilityEvent({
+                                token,
+                            });
+
+                            if (success) {
+                                window.location.href = `/${payload.redirect}`;
+                            } else {
+                                alert(errorMessage || 'Something went wrong.');
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                {% if display_mode == 'single' %}
+                    <div class="single-mode">
+                        <div class="day-label">Mon</div>
+                        <div class="day-label">Tue</div>
+                        <div class="day-label">Wed</div>
+                        <div class="day-label">Thu</div>
+                        <div class="day-label">Fri</div>
+                        <div class="day-label weekend">Sat</div>
+                        <div class="day-label weekend">Sun</div>
+        
+                        {% for day in days %}
+                            {% include 'diary/day_tile.html' with expanded=False day=day exclude_availability=True %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                        {% for month in months %}
+                            <div class="month">
+                                <div class="month-name">
+                                    {{ month.name }}
+                                </div>
+                                
+                                <div class="month-grid">
+                                    <div class="day-label">M</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">W</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">F</div>
+                                    <div class="day-label weekend">S</div>
+                                    <div class="day-label weekend">S</div>
+        
+                                    {% for day in month.days %}
+                                        {% include 'diary/day_tile.html' with expanded=False day=day exclude_availability=True %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/editAvailabilityEvent/index.js' %}"></script>
+{% endblock %}

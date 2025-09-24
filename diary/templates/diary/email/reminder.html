@@ -1,0 +1,8 @@
+{% autoescape off %}You have an event upcoming in {{ upcoming_time }}!
+
+Event title: {{ event_title }}
+Event time: {% if event_starting_time %}{{ event_starting_time|time:"h:i A" }} - {{ event_ending_time|time:"h:i A" }}{% else %}All day{% endif %}
+Event dates: {{ event_dates }}
+{% if event_description %}Event description: {{ event_description }}{% endif %}
+
+{% endautoescape %}

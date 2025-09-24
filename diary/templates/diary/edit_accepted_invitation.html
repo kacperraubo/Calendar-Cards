@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">     
+    <input type="hidden" name="section-token" value="{{ section.token }}">
+    <input type="hidden" name="invitation-token" value="{{ invitation.token }}">
+    <input type="hidden" name="event-token" value="{{ event.token }}">
+    <input type="hidden" name="event-dates" value="{{ event.stringified_dates }}">
+
+    <div class="create-event-container">
+        {% include 'diary/header.html' %}
+        {% include 'diary/mobile_month_navigation.html' %}
+        {% include 'diary/sections.html' %}
+
+        <script type="module">
+            import { redirectWithSearchParams, getSearchParams } from '/static/scripts/utilities/urls.js';
+
+            const sections = document.querySelectorAll('.sections .section');
+
+            sections.forEach((section) => {
+                section.addEventListener('click', () => {
+                    if (section.classList.contains('selected')) {
+                        return;
+                    }
+                    
+                    const token = section.dataset.token;
+                    const searchParams = getSearchParams('start-date', 'display-mode');
+
+                    redirectWithSearchParams(`/${token}`, searchParams);
+                });
+            });
+        </script>
+
+        <div class="event-container">
+            <div class="form-container">
+                <div class="form">
+                    <div class="title">Manage Invitation</div>
+
+                    <div class="input-container input-text disabled">
+                        <div class="label">
+                            <label for="owner">Creator</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="owner" 
+                                id="owner"
+                                placeholder="Enter inviter's email" 
+                                value="{{ event.owner.email }}"
+                                disabled
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="title"
+                    >
+                        <div class="label">
+                            <label for="title">Title</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="title" 
+                                id="title"
+                                placeholder="Enter event title" 
+                                value="{{ event.title }}"
+                                required
+                                disabled
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="address"
+                    >
+                        <div class="label">
+                            <label for="address">Address</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="address" 
+                                id="address"
+                                placeholder="Enter address" 
+                                disabled
+
+                                {% if event.meeting_location %}
+                                    value="{{ event.meeting_location }}"
+                                {% endif %}
+                            >
+                        </div>
+                    </div>
+
+                    {% if event.accepted_invitations.count > 0 %}
+                        <div class="label">
+                            Accepted Invitations
+                        </div>
+
+                        <ul class="guest-list accepted-list not-allowed">
+                            {% for invitation in event.accepted_invitations.all %}
+                                <li class="guest">
+                                    {{ invitation.user.email }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if event.anonymous_guests|length > 0 %}
+                        <div class="label">
+                            Anonymous Guests
+                        </div>
+
+                        <ul class="guest-list anonymous-list not-allowed">
+                            {% for guest in event.anonymous_guests %}
+                                <li class="guest">
+                                    {{ guest }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div 
+                        class="input-container input-select section-select"
+                        data-input-name="section"
+                    >
+                        <div class="label">
+                            <label for="section">Select Section</label>
+                            <span class="required">*</span>
+                        </div>
+    
+                        <div class="input">
+                            <select 
+                                name="section" 
+                                id="section" 
+                                required
+                            >                                
+                                {% for section in user.sections.all %}
+                                    <option value="{{ section.token }}" {% if section == invitation.section %}selected{% endif %}>
+                                        {{ section.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-checkbox disabled"
+                        data-input-name="all-day"
+                    >
+                        <div class="label">
+                            <label for="title">Time</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="checkbox"
+                                name="all-day" 
+                                id="all-day"
+                                class="hidden"
+                            >
+                                
+                            <div class="circle"></div>
+                            <span class="text">All day</span>
+                        </div>
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        
+                        onDocumentLoad(() => {
+                            const allDayCheckbox = document.querySelector('.input-checkbox');
+                            const text = allDayCheckbox.querySelector('.text');
+                            const timeSelect = document.querySelector('.time-select');
+                            const input = allDayCheckbox.querySelector('input');
+                            
+                            const isAllDay = '{% if event.starting_time %}false{% else %}true{% endif %}' === 'true';
+
+                            if (isAllDay) {
+                                allDayCheckbox.classList.toggle('checked');
+                                timeSelect.classList.toggle('hidden');
+                                input.checked = !input.checked;
+                            } else {
+                                allDayCheckbox.querySelector('.input').classList.add('hidden');
+                            }
+                        });
+                    </script>
+
+                    <div class="time-select not-allowed">
+                        <div class="from">None</div>
+                        <div class="divider">-</div>
+                        <div class="to">None</div>
+                        {% icon 'clock' 'icon' %}
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const existingStartTime = '{{ event.starting_time|time:"H:i" }}';
+                            const existingEndTime = '{{ event.ending_time|time:"H:i" }}';
+
+                            if (existingStartTime !== '') {
+                                const timeSelect = document.querySelector('.time-select');
+                                const from = timeSelect.querySelector('.from');
+                                const to = timeSelect.querySelector('.to');
+
+                                from.textContent = existingStartTime;
+                                to.textContent = existingEndTime;
+                            }
+                        });
+                    </script>
+
+                    <div 
+                        class="input-container input-select reminder-select"
+                        data-input-name="reminder"
+                    >
+                        <div class="label">
+                            <label for="reminder">Add Reminder</label>
+                        </div>
+    
+                        <div class="input">
+                            <select 
+                                name="reminder" 
+                                id="reminder" 
+                                required
+                            >            
+                                <option value="" selected disabled hidden>Add a reminder</option>                    
+                                {% for value, label in reminder_options %}
+                                    <option 
+                                        value="{{ value }}" 
+                                        data-label="{{ label }}"
+                                        {% if value in invitation.reminders %}class="hidden"{% endif %}
+                                    >{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reminders-list {% if not invitation.reminders|length %}hidden{% endif %}">
+                        {% for value, label in reminder_options %}
+                            {% if value in invitation.reminders %}
+                                <div class="reminder" data-value="{{ value }}">
+                                    {{ label }}
+                                    <div class="icon-container right pointer">
+                                        {% icon 'trash-2' 'icon' %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        import { getIcon } from '/static/scripts/utilities/icon.js';
+
+                        onDocumentLoad(() => {
+                            const reminderSelect = document.querySelector('.reminder-select select');
+                            const remindersList = document.querySelector('.reminders-list');
+                            let reminderCount = remindersList.querySelectorAll('.reminder').length;
+
+                            for (const reminder of remindersList.querySelectorAll('.reminder')) {
+                                const removeIcon = reminder.querySelector('.icon-container.right');
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    reminderSelect.querySelector(`option[value="${reminder.dataset.value}"]`).classList.remove('hidden');
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+                            }
+
+                            reminderSelect.addEventListener('input', async (event) => {
+                                const selectedOption = event.target.selectedOptions[0];
+                                const value = selectedOption.value;
+                                const label = selectedOption.dataset.label;
+                                
+                                selectedOption.classList.add('hidden');
+                                console.log(selectedOption);
+                                remindersList.classList.remove('hidden');
+
+                                if (remindersList.querySelector(`.reminder[data-value="${value}"]`)) {
+                                    return;
+                                }
+                                
+                                const reminder = document.createElement('div');
+                                reminder.classList.add('reminder');
+                                reminder.innerHTML = label
+                                reminder.dataset.value = value;
+
+                                const removeIcon = document.createElement('div');
+                                removeIcon.classList.add('icon-container', 'right', 'pointer');
+                                removeIcon.appendChild(await getIcon('trash-2', 'icon'));
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    selectedOption.classList.remove('hidden');
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+
+                                reminder.appendChild(removeIcon);
+                                remindersList.appendChild(reminder);
+
+                                reminderCount++;
+
+                                reminderSelect.selectedIndex = 0;
+                            });
+                        })
+                    </script>
+
+                    <button class="submit-button save-invitation-button" data-token="{{ invitation.token }}">
+                        Save
+                    </button>
+                    <button class="delete-button leave-invitation-button" data-token="{{ invitation.token }}">
+                        Leave Event
+                    </button>
+
+                    <script type="module">
+                        import { leaveInvitation } from '/static/scripts/api/leaveInvitation.js';
+
+                        const leaveInvitationButton = document.querySelector('.leave-invitation-button');
+
+                        leaveInvitationButton.addEventListener('click', async () => {
+                            if (!confirm('Are you sure you want to leave this event?')) {
+                                return;
+                            }
+
+                            const token = leaveInvitationButton.dataset.token;
+
+                            const { success, payload, errorMessage } = await leaveInvitation({ token });
+
+                            if (success) {
+                                window.location.href = `/${payload.redirect}`;
+                            } else {
+                                alert(errorMessage || 'Something went wrong');
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                {% if display_mode == 'single' %}
+                    <div class="single-mode">
+                        <div class="day-label">Mon</div>
+                        <div class="day-label">Tue</div>
+                        <div class="day-label">Wed</div>
+                        <div class="day-label">Thu</div>
+                        <div class="day-label">Fri</div>
+                        <div class="day-label weekend">Sat</div>
+                        <div class="day-label weekend">Sun</div>
+        
+                        {% for day in days %}
+                            {% include 'diary/day_tile.html' with expanded=False day=day %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                        {% for month in months %}
+                            <div class="month">
+                                <div class="month-name">
+                                    {{ month.name }}
+                                </div>
+                                
+                                <div class="month-grid">
+                                    <div class="day-label">M</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">W</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">F</div>
+                                    <div class="day-label weekend">S</div>
+                                    <div class="day-label weekend">S</div>
+        
+                                    {% for day in month.days %}
+                                        {% include 'diary/day_tile.html' with expanded=False day=day %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/editAcceptedInvitation/index.js' %}"></script>
+{% endblock %}

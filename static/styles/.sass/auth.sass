@@ -1,0 +1,90 @@
+@use './abstracts' as ab
+@use './utils' as ut
+
+.auth-container
+    width: 100%
+    min-height: 100vh
+    display: grid
+    grid-template-columns: 5.5fr 4.5fr
+    grid-template-rows: 1fr
+
+.form-container
+    @include ab.flex($direction: column, $justify: center, $align: center, $gap: ab.$space-8)
+
+    .title
+        font-size: ab.$text-xl
+        color: ab.$neutral-800
+        font-weight: 600
+
+    form
+        width: min(500px, 80%)
+
+        .submit-button
+            margin-top: ab.$space-6
+
+    .footer
+        display: none
+        color: ab.$primary-300
+
+        .footer-link
+            color: ab.$primary-600
+            font-weight: bold
+
+.welcome-container
+    @include ab.flex($direction: column, $justify: center, $align: center)
+    background-color: ab.$primary-300
+    color: ab.$neutral-100
+    padding: ab.$space-8
+
+    .time-zone
+        font-weight: 300
+
+    .year
+        margin-top: ab.$space-10
+        font-weight: 500
+
+    .month
+        margin-top: ab.$space-2
+        font-weight: 700
+        text-transform: uppercase
+        letter-spacing: 0.1em
+
+    .day
+        font-weight: 700
+        font-size: 10rem
+
+    .week-day
+        font-weight: 600
+        font-size: ab.$text-lg
+        margin-top: -1rem
+
+    .divider
+        width: 85%
+        height: 1px
+        background-color: ab.$neutral-100
+        margin: ab.$space-8 0
+
+    .welcome-text
+        font-size: 5.5rem
+        font-weight: 700
+        text-align: center
+
+    .already-have-account, .dont-have-account
+        @include ab.flex($direction: column, $justify: center, $align: center, $gap: ab.$space-6)
+        margin-top: ab.$space-8
+
+        .button
+            padding: ab.$space-3 ab.$space-6
+            border-radius: ab.$rounded-3xl
+            border: 1px solid ab.$neutral-100
+            text-decoration: none
+
+@media screen and (max-width: 1300px)
+    .auth-container
+        grid-template-columns: 1fr
+
+    .form-container .footer
+        display: block
+
+    .welcome-container
+        display: none

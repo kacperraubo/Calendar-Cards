@@ -1,0 +1,529 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">     
+    <input type="hidden" name="section-token" value="{{ section.token }}">
+
+    <div class="create-event-container">
+        {% include 'diary/header.html' %}
+        {% include 'diary/mobile_month_navigation.html' %}
+        {% include 'diary/sections.html' %}
+
+        <script type="module">
+            import { redirectWithSearchParams, getSearchParams } from '/static/scripts/utilities/urls.js';
+
+            const sections = document.querySelectorAll('.sections .section');
+
+            sections.forEach((section) => {
+                section.addEventListener('click', () => {
+                    if (section.classList.contains('selected')) {
+                        return;
+                    }
+                    
+                    const token = section.dataset.token;
+                    const searchParams = getSearchParams('start-date', 'display-mode', 'selected-days[]');
+                    searchParams.append('section', token);
+
+                    redirectWithSearchParams(window.location.pathname, searchParams);
+                });
+            });
+        </script>
+
+        <div class="event-container">
+            <div class="form-container">
+                <div class="form">
+                    <div class="title">Create Event</div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="title"
+                    >
+                        <div class="label">
+                            <label for="title">Title</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="title" 
+                                id="title"
+                                placeholder="Enter event title" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="description"
+                    >
+                        <div class="label">
+                            <label for="description">Description</label>
+                        </div>
+
+                        <div class="input">
+                            <textarea 
+                                name="description" 
+                                id="description"
+                                placeholder="Enter event description" 
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="address"
+                    >
+                        <div class="label">
+                            <label for="address">Address</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="address" 
+                                id="address"
+                                placeholder="Enter address" 
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="guests"
+                    >
+                        <div class="label">
+                            <label for="title">Guests</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="email"
+                                name="guests" 
+                                id="guests"
+                                placeholder="Add a guest" 
+                            >
+
+                            <div class="icon-container right pointer">
+                                {% icon 'plus' 'icon' %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="guest-list hidden"></ul>
+
+                    <script type="module">
+                        import { getIcon } from '/static/scripts/utilities/icon.js';
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const guestsInput = document.querySelector('input[name="guests"]');
+                            const guestListContainer = document.querySelector('.guest-list');
+                            const addIcon = document.querySelector('.icon-container.right');
+
+                            let guestList = [];
+
+                            addIcon.addEventListener('click', async () => {
+                                if (!guestsInput.value) {
+                                    return;
+                                }
+
+                                if (!guestsInput.checkValidity()) {
+                                    alert('Invalid email.');
+                                    return;
+                                }
+
+                                if (guestList.includes(guestsInput.value)) {
+                                    alert('Guest already added.');
+                                    return;
+                                }
+
+                                guestList.push(guestsInput.value);
+
+                                const guest = document.createElement('li');
+                                guest.classList.add('guest');
+                                guest.innerHTML = guestsInput.value;
+                                
+                                const removeIcon = await getIcon('trash-2', 'icon');
+                                removeIcon.classList.add('pointer');
+
+                                removeIcon.addEventListener('click', () => {
+                                    guestList = guestList.filter((guest) => guest !== guestsInput.value);
+                                    guest.remove();
+
+                                    if (guestList.length === 0) {
+                                        guestListContainer.classList.add('hidden');
+                                    }
+                                });
+
+                                guest.appendChild(removeIcon);
+                                guestListContainer.appendChild(guest);
+
+                                guestListContainer.classList.remove('hidden');
+
+                                guestsInput.value = '';
+                            });
+                        });
+                    </script>
+
+                    <div 
+                        class="input-container input-checkbox"
+                        data-input-name="all-day"
+                    >
+                        <div class="label">
+                            <label for="title">Time</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="checkbox"
+                                name="all-day" 
+                                id="all-day"
+                                class="hidden"
+                            >
+                                
+                            <div class="circle"></div>
+                            <span class="text">All day</span>
+                        </div>
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        
+                        onDocumentLoad(() => {
+                            const allDayCheckbox = document.querySelector('.input-checkbox');
+                            const text = allDayCheckbox.querySelector('.text');
+                            const timeSelect = document.querySelector('.time-select');
+                            const input = allDayCheckbox.querySelector('input');
+
+                            allDayCheckbox.addEventListener('click', () => {
+                                allDayCheckbox.classList.toggle('checked');
+                                timeSelect.classList.toggle('hidden');
+                                input.checked = !input.checked;
+                            });
+                        });
+                    </script>
+
+                    <div class="time-select">
+                        <div class="placeholder">Select time</div>
+                        <div class="from hidden">None</div>
+                        <div class="divider hidden">-</div>
+                        <div class="to hidden">None</div>
+                        {% icon 'clock' 'icon' %}
+
+                        <div class="intervals hidden">
+                            {% for time_slot in time_slots %}
+                                <div 
+                                    class="interval"
+                                    data-start="{{ time_slot.start|time:'H:i' }}"
+                                    data-start-display="{{ time_slot.start|time:'g:i A' }}"
+                                    data-end="{{ time_slot.end|time:'H:i' }}"
+                                    data-end-display="{{ time_slot.end|time:'g:i A' }}"
+                                >   
+                                    <span>
+                                        {{ time_slot.start|time:"g:i A" }}
+                                    </span>
+                                    <span>&nbsp;-&nbsp;</span>
+                                    <span>
+                                        {{ time_slot.end|time:"g:i A" }}
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="start-time" value="">
+                    <input type="hidden" name="end-time" value="">
+
+                    <script type="module">
+                        import { onDocumentLoad, onClickOutside, tick } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const timeSelect = document.querySelector('.time-select');
+                            const intervals = timeSelect.querySelector('.intervals');
+                            const fromContainer = timeSelect.querySelector('.from');
+                            const toContainer = timeSelect.querySelector('.to');
+                            const startTimeInput = document.querySelector('input[name="start-time"]');
+                            const endTimeInput = document.querySelector('input[name="end-time"]');
+                            const placeholder = timeSelect.querySelector('.placeholder');
+                            const divider = timeSelect.querySelector('.divider');
+
+                            let startTime = null;
+                            let endTime = null;
+
+                            timeSelect.addEventListener('click', async (event) => {
+                                if (intervals.contains(event.target)) {
+                                    return;
+                                }
+                                
+                                if (intervals.classList.contains('hidden')) {
+                                    intervals.classList.remove('hidden');
+
+                                    await tick();
+                                } else {
+                                    intervals.classList.add('hidden');
+                                }
+                            });
+
+                            const isBeforeInTree = (a, b) => {
+                                const parent = a.parentElement;
+
+                                return Array.from(parent.children).indexOf(a) < Array.from(parent.children).indexOf(b);
+                            }
+
+                            const selectFromTo = (from, to) => {
+                                from.classList.add('selected');
+                                to.classList.add('selected');
+
+                                let start = false;
+                                let end = false;
+
+                                intervals.querySelectorAll('.interval').forEach((interval) => {
+                                    interval.classList.remove('selected');
+
+                                    if (interval === from) {
+                                        start = true;
+                                    }
+
+                                    if (start && !end) {
+                                        interval.classList.add('selected');
+                                    }
+
+                                    if (interval === to) {
+                                        end = true;
+                                    }
+                                });
+                            }
+
+                            intervals.querySelectorAll('.interval').forEach((interval) => {
+                                interval.addEventListener('click', () => {
+                                    if (interval === startTime) {
+                                        placeholder.classList.remove('hidden');
+                                        
+                                        fromContainer.classList.add('hidden');
+                                        toContainer.classList.add('hidden');
+                                        divider.classList.add('hidden');
+
+                                        startTime = null;
+                                        endTime = null;
+              
+                                        startTimeInput.value = '';
+                                        endTimeInput.value = '';
+
+                                        intervals.querySelectorAll('.interval').forEach((interval) => {
+                                            interval.classList.remove('selected');
+                                        });
+
+                                        return;
+                                    } else {
+                                        placeholder.classList.add('hidden');
+                                        fromContainer.classList.remove('hidden');
+                                        toContainer.classList.remove('hidden');
+                                        divider.classList.remove('hidden');
+                                    }
+
+                                    if (interval === endTime) {
+                                        endTime.classList.remove('selected');
+                                        endTime = endTime.previousElementSibling;
+                                        toContainer.innerHTML = endTime.dataset.endDisplay;
+                                        document.querySelector('input[name="end-time"]').value = `${endTime.dataset.end}`;
+                                        return;
+                                    }
+
+                                    if (!startTime) {
+                                        startTime = interval;
+                                        interval.classList.add('selected');
+                                        fromContainer.innerHTML = interval.dataset.startDisplay;
+                                        document.querySelector('input[name="start-time"]').value = `${interval.dataset.start}`;
+
+                                        endTime = interval;
+                                        toContainer.innerHTML = interval.dataset.endDisplay;
+                                        document.querySelector('input[name="end-time"]').value = `${interval.dataset.end}`;
+                                    } else {
+                                        if (isBeforeInTree(interval, startTime)) {
+                                            if (endTime) {
+                                                startTime = interval;
+                                                fromContainer.innerHTML = interval.dataset.startDisplay;
+                                                document.querySelector('input[name="start-time"]').value = `${interval.dataset.start}`;
+                                                selectFromTo(startTime, endTime);
+                                            } else {
+                                                endTime = startTime;
+                                                document.querySelector('input[name="end-time"]').value = `${startTime.dataset.end}`;
+                                                toContainer.innerHTML = startTime.dataset.endDisplay;
+
+                                                startTime = interval;
+                                                fromContainer.innerHTML = interval.dataset.startDisplay;
+                                                document.querySelector('input[name="start-time"]').value = `${interval.dataset.start}`;
+
+                                                selectFromTo(startTime, endTime);
+                                            }
+                                        } else {
+                                            endTime = interval;
+                                            toContainer.innerHTML = interval.dataset.endDisplay;
+                                            document.querySelector('input[name="end-time"]').value = `${interval.dataset.end}`;
+                                            
+                                            selectFromTo(startTime, endTime);
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
+                    <div 
+                        class="input-container input-select reminder-select"
+                        data-input-name="reminder"
+                    >
+                        <div class="label">
+                            <label for="reminder">Add Reminder</label>
+                        </div>
+    
+                        <div class="input">
+                            <select 
+                                name="reminder" 
+                                id="reminder" 
+                                required
+                            >            
+                                <option value="" selected disabled hidden>Add a reminder</option>                    
+                                {% for value, label in reminder_options %}
+                                    <option value="{{ value }}" data-label="{{ label }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reminders-list hidden"></div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        import { getIcon } from '/static/scripts/utilities/icon.js';
+
+                        onDocumentLoad(() => {
+                            const reminderSelect = document.querySelector('.reminder-select select');
+                            const remindersList = document.querySelector('.reminders-list');
+                            let reminderCount = remindersList.querySelectorAll('.reminder').length;
+
+                            for (const reminder of remindersList.querySelectorAll('.reminder')) {
+                                const removeIcon = reminder.querySelector('.icon-container.right');
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+                            }
+
+                            reminderSelect.addEventListener('input', async (event) => {
+                                const selectedOption = event.target.selectedOptions[0];
+                                const value = selectedOption.value;
+                                const label = selectedOption.dataset.label;
+                                
+                                selectedOption.classList.add('hidden');
+                                console.log(selectedOption);
+                                remindersList.classList.remove('hidden');
+
+                                if (remindersList.querySelector(`.reminder[data-value="${value}"]`)) {
+                                    return;
+                                }
+                                
+                                const reminder = document.createElement('div');
+                                reminder.classList.add('reminder');
+                                reminder.innerHTML = label
+                                reminder.dataset.value = value;
+
+                                const removeIcon = document.createElement('div');
+                                removeIcon.classList.add('icon-container', 'right', 'pointer');
+                                removeIcon.appendChild(await getIcon('trash-2', 'icon'));
+
+                                removeIcon.addEventListener('click', () => {
+                                    reminder.remove();
+                                    reminderCount--;
+
+                                    selectedOption.classList.remove('hidden');
+
+                                    if (reminderCount === 0) {
+                                        remindersList.classList.add('hidden');
+                                    }
+                                });
+
+                                reminder.appendChild(removeIcon);
+                                remindersList.appendChild(reminder);
+
+                                reminderCount++;
+
+                                reminderSelect.selectedIndex = 0;
+                            });
+                        })
+                    </script>
+
+                    <button class="submit-button create-event-button">
+                        Create
+                    </button>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                {% if display_mode == 'single' %}
+                    <div class="single-mode">
+                        <div class="day-label">Mon</div>
+                        <div class="day-label">Tue</div>
+                        <div class="day-label">Wed</div>
+                        <div class="day-label">Thu</div>
+                        <div class="day-label">Fri</div>
+                        <div class="day-label weekend">Sat</div>
+                        <div class="day-label weekend">Sun</div>
+        
+                        {% for day in days %}
+                            {% include 'diary/day_tile.html' with expanded=False day=day exclude_availability=True %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                        {% for month in months %}
+                            <div class="month">
+                                <div class="month-name">
+                                    {{ month.name }}
+                                </div>
+                                
+                                <div class="month-grid">
+                                    <div class="day-label">M</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">W</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">F</div>
+                                    <div class="day-label weekend">S</div>
+                                    <div class="day-label weekend">S</div>
+        
+                                    {% for day in month.days %}
+                                        {% include 'diary/day_tile.html' with expanded=False day=day exclude_availability=True %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/createEvent/index.js' %}"></script>
+{% endblock %}

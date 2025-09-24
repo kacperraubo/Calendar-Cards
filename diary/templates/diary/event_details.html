@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">     
+    <input type="hidden" name="section-token" value="{{ section.token }}">
+    <input type="hidden" name="invitation-token" value="{{ invitation.token }}">
+    <input type="hidden" name="event-token" value="{{ event.token }}">
+    <input type="hidden" name="event-dates" value="{{ event.stringified_dates }}">
+
+    <div class="create-event-container">
+        {% include 'diary/header.html' with exclude_delete_section_button=True exclude_add_section_button=True %}
+        {% include 'diary/mobile_month_navigation.html' %}
+
+        <div class="event-container">
+            <div class="form-container">
+                <div class="form">
+                    <div class="title">Event Details</div>
+
+                    <div 
+                        class="input-container input-text disabled"
+                        data-input-name="title"
+                    >
+                        <div class="label">
+                            <label for="title">Title</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="title" 
+                                id="title"
+                                placeholder="Enter event title" 
+                                value="{{ event.title }}"
+                                required
+                                disabled
+                            >
+                        </div>
+                    </div>
+                    
+                    {% if event.description %}
+                        <div 
+                            class="input-container input-textarea disabled"
+                            data-input-name="description"
+                        >
+                            <div class="label">
+                                <label for="description">Description</label>
+                            </div>
+
+                            <div class="input">
+                                <textarea 
+                                    name="description" 
+                                    id="description"
+                                    placeholder="Enter event description" 
+                                    required
+                                    disabled
+                                >{{ event.description }}</textarea>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if event.meeting_location %}
+                        <div 
+                            class="input-container input-text disabled"
+                            data-input-name="address"
+                        >
+                            <div class="label">
+                                <label for="address">Address</label>
+                            </div>
+
+                            <div class="input">
+                                <input 
+                                    type="text"
+                                    name="address" 
+                                    id="address"
+                                    disabled
+
+                                    {% if event.meeting_location %}
+                                        value="{{ event.meeting_location }}"
+                                    {% endif %}
+                                >
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if event.accepted_invitations.count > 0 %}
+                        <div class="label">
+                            Accepted Invitations
+                        </div>
+
+                        <ul class="guest-list accepted-list not-allowed">
+                            {% for invitation in event.accepted_invitations.all %}
+                                <li class="guest">
+                                    {{ invitation.user.email }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if event.anonymous_guests|length > 0 %}
+                        <div class="label">
+                            Unregistered Guests
+                        </div>
+
+                        <ul class="guest-list anonymous-list not-allowed">
+                            {% for guest in event.anonymous_guests %}
+                                <li class="guest">
+                                    {{ guest }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div 
+                        class="input-container input-checkbox disabled"
+                        data-input-name="all-day"
+                    >
+                        <div class="label">
+                            <label for="title">Time</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="checkbox"
+                                name="all-day" 
+                                id="all-day"
+                                class="hidden"
+                            >
+                                
+                            <div class="circle"></div>
+                            <span class="text">All day</span>
+                        </div>
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+                        
+                        onDocumentLoad(() => {
+                            const allDayCheckbox = document.querySelector('.input-checkbox');
+                            const text = allDayCheckbox.querySelector('.text');
+                            const timeSelect = document.querySelector('.time-select');
+                            const input = allDayCheckbox.querySelector('input');
+                            
+                            const isAllDay = '{% if event.starting_time %}false{% else %}true{% endif %}' === 'true';
+
+                            if (isAllDay) {
+                                allDayCheckbox.classList.toggle('checked');
+                                timeSelect.classList.toggle('hidden');
+                                input.checked = !input.checked;
+                            } else {
+                                allDayCheckbox.querySelector('.input').classList.add('hidden');
+                            }
+                        });
+                    </script>
+
+                    <div class="time-select not-allowed">
+                        <div class="from">None</div>
+                        <div class="divider">-</div>
+                        <div class="to">None</div>
+                        {% icon 'clock' 'icon' %}
+                    </div>
+
+                    <script type="module">
+                        import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const existingStartTime = '{{ event.starting_time|time:"H:i" }}';
+                            const existingEndTime = '{{ event.ending_time|time:"H:i" }}';
+
+                            if (existingStartTime !== '') {
+                                const timeSelect = document.querySelector('.time-select');
+                                const from = timeSelect.querySelector('.from');
+                                const to = timeSelect.querySelector('.to');
+
+                                from.textContent = existingStartTime;
+                                to.textContent = existingEndTime;
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                {% if display_mode == 'single' %}
+                    <div class="single-mode">
+                        <div class="day-label">Mon</div>
+                        <div class="day-label">Tue</div>
+                        <div class="day-label">Wed</div>
+                        <div class="day-label">Thu</div>
+                        <div class="day-label">Fri</div>
+                        <div class="day-label weekend">Sat</div>
+                        <div class="day-label weekend">Sun</div>
+        
+                        {% for day in days %}
+                            {% include 'diary/day_tile.html' with expanded=False day=day exclude_sensitive_data=True %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                        {% for month in months %}
+                            <div class="month">
+                                <div class="month-name">
+                                    {{ month.name }}
+                                </div>
+                                
+                                <div class="month-grid">
+                                    <div class="day-label">M</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">W</div>
+                                    <div class="day-label">T</div>
+                                    <div class="day-label">F</div>
+                                    <div class="day-label weekend">S</div>
+                                    <div class="day-label weekend">S</div>
+        
+                                    {% for day in month.days %}
+                                        {% include 'diary/day_tile.html' with expanded=False day=day exclude_sensitive_data=True %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/eventDetails/index.js' %}"></script>
+{% endblock %}

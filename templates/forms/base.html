@@ -1,0 +1,9 @@
+<div class="input-list">
+    {% for field in form %}
+        {% include "forms/field.html" with field=field %}
+    {% endfor %}
+
+    {% if form.non_field_errors.0 %}
+        <div class="error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+</div>

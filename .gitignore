@@ -1,0 +1,14 @@
+.vscode
+.venv
+.env
+.ebextensions
+.github
+.platform
+Procfile
+
+
+__pycache__
+*.pyc
+*.ps1
+
+celerybeat-schedule.*

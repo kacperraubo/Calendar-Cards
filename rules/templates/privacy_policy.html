@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+{% block refs %}
+        <link rel="stylesheet" type="text/css" href="">
+{% endblock %}
+
+
+{% block content %}
+        <div class="close_bttn" onclick="window.history.back()"></div>
+        <div id="privacy_policy_container" style="margin: 0 0.938rem 0.938rem 0.938rem;">
+            <div class="mt-1" style="text-align: center;">
+                <h1 style="margin-top: 0; margin-bottom: 0.469rem;">Privacy Policy</h1>
+                <div style="line-height: 1.3rem;">
+                    We collect your personal information so that we can provide you the content you purchase, download, or want to update in our services.
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <h4>Providing the store</h4>
+                <div class="mt-1" style="line-height: 1.3rem;">
+                    We use your personal information to provide the services and features in our services. This information includes, for example, your account and payment information, which you can access and change in settings, and your purchase history.
+                </div>
+            </div>
+
+
+            <div class="mt-2">
+                <h4>Communicating with you</h4>
+                <div class="mt-1" style="line-height: 1.3rem;">
+                    Our services may use information about your account, to send you communications about them.
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <h4>Sharing with Third Parties</h4>
+                <div class="mt-1" style="line-height: 1.3rem;">
+                    We are obligated to provide some non-personal information to strategic partners that work with us to provide our products and services. For example, we may share non-personal information with payments processing provider, required for functioning properly.
+                </div>
+                <div class="mt-1">
+                    We may also share some information with developers to help them operate and improve their apps.
+                </div>
+            </div>
+
+            <div class="mt-1" class="mt-2">
+                Information about products not manufactured by us, or independent websites not controlled or tested by us, is provided without recommendation or endorsement. We assumes no responsibility with regard to the selection, performance, or use of third-party websites or products. We makes no representations regarding third-party website accuracy or reliability. Contact the vendor for additional information.
+            </div>
+        </div>
+{% endblock %}
+{% block scripts %}
+        <script type="text/javascript" src=""></script>
+{% endblock %}

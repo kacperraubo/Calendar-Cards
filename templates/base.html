@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-type" content="application/x-www-form-urlencoded; charset=UTF-8"/>
+        <link rel="icon" href="{% static 'images/favicon.png' %}">
+        {% block meta %}{% endblock %}
+
+        <link rel="stylesheet" type="text/css" href="{% static 'styles/css/normalize.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'styles/css/globals.css' %}">
+        {% block refs %}{% endblock %}
+
+        <script defer data-domain="calendar-cards.app" src="https://plausible.io/js/script.js"></script>
+        {% block head_scripts %}{% endblock %}
+    </head>
+    <body>
+        <input type="hidden" name="is-anonymous" value="{% if user.is_anonymous %}true{% else %}false{% endif %}">
+        <header>
+            {% block header %}{% endblock %}
+        </header>
+        <main class="jsMainlayout">
+            {% csrf_token %}
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

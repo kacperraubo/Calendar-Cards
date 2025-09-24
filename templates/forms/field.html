@@ -1,0 +1,207 @@
+{% load define %}
+{% load icons %}
+
+{% define field.auto_id as id %}
+{% define field.name as name %}
+{% define field.field.widget.input_type as type %}
+{% define field.value as value %}
+{% define field.field.required as required %}
+{% define field.errors.0 as error %}
+{% define field.label as label %}
+{% define field.field.widget.attrs as attrs %}
+{% define attrs.placeholder as placeholder %}
+
+{% define '' as extra_class %}
+
+{% if attrs.rounded %}
+    {% define extra_class|add:'rounded' as extra_class %}
+{% endif %}
+
+{% if type == 'hidden' %}
+    <input type="hidden" name="{{ name }}" value="{{ value }}">
+{% elif type == 'text' or type == 'number' or type == 'email' %}
+    <div 
+        class="input-container input-text {{ extra_class }}"
+        data-input-name="{{ name }}"
+    >
+        {% if label %}
+            <div class="label">
+                <label for="{{ id }}">{{ label }}</label>
+
+                {% if required %}
+                    <span class="required">*</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="input">
+            {% if attrs.left_icon %}
+                <div class="icon-container left">
+                    {% icon attrs.left_icon "icon" %}
+                </div>
+            {% endif %}
+
+            <input 
+                type="{{ type }}" 
+                name="{{ name }}" 
+                id="{{ id }}" 
+
+                {% if required %}required{% endif %}
+                {% if value %}value="{{ value }}"{% endif %}
+                {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+            >
+
+            {% if attrs.right_icon %}
+                <div class="icon-container right">
+                    {% icon attrs.right_icon "icon" %}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+{% elif type == 'password' %}
+    <div 
+        class="input-container input-password {{ extra_class }}"
+        data-input-name="{{ name }}"
+    >
+        {% if label %}
+            <div class="label">
+                <label for="{{ id }}">{{ label }}</label>
+
+                {% if required %}
+                    <span class="required">*</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="input">
+            {% if attrs.left_icon %}
+                <div class="icon-container left">
+                    {% icon attrs.left_icon "icon" %}
+                </div>
+            {% endif %}
+
+            <input 
+                type="password" 
+                name="{{ name }}" 
+                id="{{ id }}" 
+
+                {% if required %}required{% endif %}
+                {% if value %}value="{{ value }}"{% endif %}
+                {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+            >
+
+            <script type="module">
+                import { getIcon } from '/static/scripts/utilities/icon.js';
+                import { onDocumentLoad } from '/static/scripts/utilities/document.js';
+
+                onDocumentLoad(async () => {
+                    const hiddenIcon = await getIcon('eye', 'icon');
+                    const visibleIcon = await getIcon('eye-off', 'icon');
+
+                    const inputContainer = document.querySelector('.input-password[data-input-name="{{ name }}');
+                    const input = inputContainer.querySelector('input');
+                    const rightIconContainer = inputContainer.querySelector('.icon-container.right');
+                    const rightIcon = rightIconContainer.querySelector('.icon');
+
+                    rightIcon.addEventListener('click', () => {
+                        rightIcon.innerHTML = '';
+
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            rightIcon.appendChild(visibleIcon);
+                        } else {
+                            input.type = 'password';
+                            rightIcon.appendChild(hiddenIcon);
+                        }
+                    });
+                }); 
+            </script>
+            
+            <div class="icon-container right pointer">
+                {% icon 'eye' "icon" %}
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+{% elif type == 'select' %}
+    <div 
+        class="input-container input-select {{ extra_class }}"
+        data-input-name="{{ name }}"
+    >
+        {% if label %}
+            <div class="label">
+                <label for="{{ id }}">{{ label }}</label>
+
+                {% if required %}
+                    <span class="required">*</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="input">
+            <select 
+                name="{{ name }}" 
+                id="{{ id }}" 
+
+                {% if required %}required{% endif %}
+            >
+                {% for option in field.field.widget.choices %}
+                    <option 
+                        value="{{ option.0 }}"
+                        {% if option.0 == value %}selected{% endif %}
+                    >
+                        {{ option.1 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+{% elif type == 'textarea' %}
+    <div 
+        class="input-container input-textarea {{ extra_class }}"
+        data-input-name="{{ name }}"
+    >
+        {% if label %}
+            <div class="label">
+                <label for="{{ id }}">{{ label }}</label>
+
+                {% if required %}
+                    <span class="required">*</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="input">
+            <textarea 
+                name="{{ name }}" 
+                id="{{ id }}" 
+
+                {% if required %}required{% endif %}
+                {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+            >{{ value }}</textarea>
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+{% elif name == "captcha" %}
+		{{ field }}
+		{% if field.errors %}
+	      <div class="error">
+	          {{ field.errors.0 }}
+	      </div>
+	  {% endif %}
+{% endif %}
+

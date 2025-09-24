@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="form-container">
+            <p class="title">Confirm your e-mail address</p>
+
+            <form action="{% url 'email_confirmation_view' %}" method="post">
+                {% csrf_token %}
+                {% include 'forms/base.html' with form=form %}
+                <button type="submit" class="submit-button rounded">Confirm</button>
+            </form>
+        </div>
+        <div class="welcome-container">
+            <span class="time-zone"></span>
+            <span class="year"></span>
+            <span class="month"></span>
+            <span class="day"></span>
+            <span class="week-day"></span>
+            
+            <div class="divider"></div>
+
+            <span class="welcome-text">Welcome to Calendar Cards</span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module">
+        import { getFormattedTimeZone, dateParts } from '/static/scripts/utilities/date.js';
+
+        const { fullYear, monthName, day, weekday } = dateParts(new Date());
+        
+        document.querySelector(
+            '.welcome-container .time-zone'
+        ).textContent = getFormattedTimeZone();
+
+        document.querySelector(
+            '.welcome-container .year'
+        ).textContent = fullYear;
+
+        document.querySelector(
+            '.welcome-container .month'
+        ).textContent = monthName;
+
+        document.querySelector(
+            '.welcome-container .day'
+        ).textContent = day;
+
+        document.querySelector(
+            '.welcome-container .week-day'
+        ).textContent = weekday;
+    </script>
+{% endblock %}

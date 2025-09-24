@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/invitations.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="invitations-container">
+        {% include 'diary/header.html' with exclude_delete_section_button=True exclude_rename_section_button=True %}
+        {% include 'diary/sections.html' %}
+
+        {% if invitations %}
+            <div class="invitations">
+                {% for invitation in invitations %}
+                    <div 
+                        class="invitation"
+                        data-token="{{ invitation.token }}"
+                    >
+                        <div class="invitation-details">
+                            <div class="invitation-title detail">
+                                <div class="label">
+                                    Title
+                                </div>
+                                <div class="text">
+                                    {{ invitation.event.title }}
+                                </div>
+                            </div>
+                            <div class="invitation-inviter detail">
+                                <div class="label">
+                                    Invited by
+                                </div>
+                                <div class="text">
+                                    {{ invitation.event.owner.email }}
+                                </div>
+                            </div>
+                            <div class="invitation-dates detail">
+                                <div class="label">
+                                    Dates
+                                </div>
+                                
+                                <div class="text">
+                                    {% for date in invitation.event.dates %}{{ date|date:"d M Y" }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                            </div>
+                            <div class="invitation-time detail">
+                                <div class="label">
+                                    Time
+                                </div>
+                                
+                                <div class="text">
+                                    {% if invitation.event.starting_time %}
+                                        {{ invitation.event.starting_time|time:"h:i A" }} - {{ invitation.event.ending_time|time:"h:i A" }}
+                                    {% else %}
+                                        All day
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div 
+                            class="input-container input-select section-select"
+                            data-input-name="section"
+                        >
+                            <div class="label">
+                                <label for="section">Select Section</label>
+                                <span class="required">*</span>
+                            </div>
+        
+                            <div class="input">
+                                <select 
+                                    name="section" 
+                                    id="section" 
+                                    required
+                                >
+                                    <option value="" disabled selected>Select a section</option>
+                                    
+                                    {% for section in user.sections.all %}
+                                        <option value="{{ section.token }}">{{ section.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="invitation-buttons">
+                            <button class="submit-button accept-invite-button">
+                                Accept
+                            </button>
+                            <button class="delete-button delete-invite-button">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <script type="module">
+                import { respondToInvitation } from '/static/scripts/api/respondToInvitation.js';
+
+                const invitations = document.querySelectorAll('.invitation');
+
+                invitations.forEach((invitation) => {
+                    const token = invitation.dataset.token;
+                    const acceptButton = invitation.querySelector('.accept-invite-button');
+                    const deleteButton = invitation.querySelector('.delete-invite-button');
+                    const select = invitation.querySelector('select');
+
+                    acceptButton.addEventListener('click', async () => {
+                        if (!select.value) {
+                            alert('Please select a section');
+                            return;
+                        }
+
+                        const { success, errorMessage } = await respondToInvitation({
+                            token,
+                            accept: true,
+                            section: select.value,
+                        });
+
+                        if (success) {
+                            invitation.remove();
+                        } else {
+                            alert(errorMessage || 'Something went wrong');
+                        }
+                    });
+
+                    deleteButton.addEventListener('click', async () => {
+                        const { success, errorMessage } = await respondToInvitation({
+                            token,
+                            accept: false,
+                        });
+
+                        if (success) {
+                            invitation.remove();
+                        } else {
+                            alert(errorMessage || 'Something went wrong');
+                        }
+                    }); 
+                });
+            </script>
+        {% else %}
+            <div class="no-invitations">
+                You have no invitations
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

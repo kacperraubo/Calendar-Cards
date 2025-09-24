@@ -1,0 +1,112 @@
+.pointer {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.not-allowed {
+  cursor: not-allowed !important;
+}
+
+.hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.invitations-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0;
+  flex-wrap: no-wrap;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #FBFCFF;
+  padding: 0 2rem 2rem 2rem;
+}
+.invitations-container .invitations {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+}
+.invitations-container .invitations .invitation {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #F0F2F5;
+  border-radius: 0.5rem;
+  border: 1px solid #CED4E1;
+}
+.invitations-container .invitations .invitation .invitation-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  color: #424E66;
+}
+.invitations-container .invitations .invitation .invitation-details .detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.25rem;
+  flex-wrap: no-wrap;
+}
+.invitations-container .invitations .invitation .invitation-details .detail .label {
+  color: #5F6D8A;
+}
+.invitations-container .invitations .invitation .invitation-details .invitation-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.invitations-container .invitations .invitation .invitation-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+}
+.invitations-container .invitations .invitation .invitation-buttons button {
+  width: 50%;
+}
+.invitations-container .no-invitations {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  font-size: 1.5rem;
+  color: #424E66;
+  margin: auto;
+}
+
+/*# sourceMappingURL=invitations.css.map */

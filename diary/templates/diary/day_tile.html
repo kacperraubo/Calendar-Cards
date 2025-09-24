@@ -1,0 +1,178 @@
+{% load icons %}
+{% load define %}
+
+{% if expanded %}
+    <div class="
+        day
+        {% if day.datetime.date == today %} 
+            today
+        {% endif %}
+        {% if day.is_weekend %} 
+            weekend
+        {% endif %}
+        {% if day.is_previous_month %} 
+            previous-month
+        {% endif %}
+        {% if day.is_selected %} 
+            selected
+        {% endif %}
+    "
+        data-date="{{ day.datetime|date:'Y-m-d' }}"
+    
+        {% if day.is_previous_month %} 
+            data-is-previous-month="true"
+        {% endif %}
+
+        {% if not exclude_sensitive_data and not exclude_availability %}
+            {% if day.availability %} 
+                data-has-availability="true"
+                data-jsonified-time-slots="{{ day.availability.jsonified_time_slots }}"
+                data-availability-token="{{ day.availability.token }}"
+            {% endif %}
+        {% endif %}
+    >
+        <div class="day-number">{{ day.datetime|date:"j" }}</div>  
+
+        {% if not exclude_sensitive_data and not exclude_availability %}
+            <div class="availability {% if day.availability.is_ongoing %}ongoing{% endif %}">
+                {% if day.availability %}
+                    {% icon 'clock-filled' 'icon' %}
+                {% else %}
+                    {% icon 'clock' 'icon' %}
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        {% if not exclude_events and not exclude_sensitive_data %}
+            {% if day.events %}
+                <div class="event-count">
+                    <span class="count">
+                        {{ day.events|length }}
+                    </span>
+                </div>
+            {% endif %}
+
+            <div class="events">
+                {% for event in day.events %}
+                    <a 
+                    href="
+                        {% if event.availability %}
+                            {% url 'edit_availability_event' event.token %}
+                        {% else %}
+                            {% url 'edit_event' event.token %}?display-mode={{ display_mode }}&start-date={{ start_date|date:'Y-m' }}
+                        {% endif %}
+                    " 
+                    class="
+                        {% if event.ending_time %} 
+                            {% if day.datetime.date == today %}
+                                {% if event.ending_time < now.time %}
+                                    finished
+                                {% elif event.starting_time < now.time %}
+                                    ongoing
+                                {% else %}
+                                    upcoming
+                                {% endif %}
+                            {% elif day.datetime.date < today %}
+                                finished
+                            {% else %}
+                                upcoming
+                            {% endif %}
+                        {% elif day.datetime.date < today %} 
+                            finished
+                        {% elif day.datetime.date == today %} 
+                            ongoing
+                        {% else %} 
+                            upcoming
+                        {% endif %}
+                        event
+                        {% if event.ending_time %} 
+                            {% if day.datetime.date == today %}
+                                {% if event.ending_time < now.time %}
+                                    finished
+                                {% elif event.starting_time < now.time %}
+                                    ongoing
+                                {% else %}
+                                    upcoming
+                                {% endif %}
+                            {% elif day.datetime.date < today %}
+                                finished
+                            {% else %}
+                                upcoming
+                            {% endif %}
+                        {% elif day.datetime.date < today %} 
+                            finished
+                        {% elif day.datetime.date == today %} 
+                            ongoing
+                        {% else %} 
+                            upcoming
+                        {% endif %}
+                    ">
+                        <span class="event-time">
+                            {% if event.starting_time %} 
+                                {{ event.starting_time|time:"h:i A" }}
+                                - 
+                                {{ event.ending_time|time:"h:i A" }}
+                            {% else %}
+                                All day
+                            {% endif %}
+                        </span>
+                        <span class="event-title" title="{{ event.title }}">
+                            {{ event.title }}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="
+        day
+        {% if day.datetime.date == today %} 
+            today
+        {% endif %}
+        {% if day.is_weekend %} 
+            weekend
+        {% endif %}
+        {% if day.is_previous_month %} 
+            previous-month
+        {% endif %}
+        {% if day.is_selected %} 
+            selected
+        {% endif %}
+    "
+        data-date="{{ day.datetime|date:'Y-m-d' }}"
+
+        {% if day.is_previous_month %} 
+            data-is-previous-month="true"
+        {% endif %}
+
+        {% if not exclude_sensitive_data and not exclude_availability %}
+            {% if day.availability %} 
+                data-has-availability="true"
+                data-jsonified-time-slots="{{ day.availability.jsonified_time_slots }}"
+            {% endif %}
+        {% endif %}
+    >
+        <div class="day-number">{{ day.datetime|date:"j" }}</div>  
+
+        {% if not exclude_sensitive_data and not exclude_availability %}
+            <div class="availability {% if day.availability.is_ongoing %}ongoing{% endif %}">
+                {% if day.availability %}
+                    {% icon 'clock-filled' 'icon' %}
+                {% else %}
+                    {% icon 'clock' 'icon' %}
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        {% if not exclude_events and not exclude_sensitive_data %}
+            {% if day.has_ongoing_event %}
+                <div class="event-marker ongoing"></div>
+            {% elif day.has_future_event %}
+                <div class="event-marker upcoming"></div>
+            {% elif day.has_past_event %}
+                <div class="event-marker finished"></div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}

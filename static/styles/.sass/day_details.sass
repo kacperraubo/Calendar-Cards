@@ -1,0 +1,74 @@
+@use './abstracts' as ab
+@use './utils' as ut
+
+.day-details-container
+    @include ab.flex($direction: column, $gap: ab.$space-4)
+    width: 100%
+    min-height: 100vh
+    background-color: ab.$neutral-50
+    padding: 0 ab.$space-8 ab.$space-8 ab.$space-8
+
+    a
+        text-decoration: none
+
+.single-mode
+    position: sticky
+    top: ab.$space-4
+    left: 0
+
+.day-details-wrapper
+    width: 100%
+    display: grid
+    grid-template-columns: 7fr 3fr
+    gap: ab.$space-8
+
+    .day-details
+        position: static
+
+    @media screen and (max-width: 1300px)
+        grid-template-columns: 1fr 1fr
+
+    @media screen and (max-width: 750px)
+        grid-template-columns: 1fr
+
+        .single-mode
+            display: none
+
+.day-details
+    @include ab.flex($direction: column, $gap: ab.$space-6)
+    position: sticky
+    top: ab.$space-4
+    left: 0
+
+.date-label
+    color: ab.$neutral-800
+    font-size: ab.$text-2xl
+    font-weight: 600
+
+.events, .invitations, .availability-events, .day-details .availability
+    @include ab.flex($direction: column, $gap: ab.$space-3)
+    width: 100%
+
+    a
+        width: 100%
+
+.section-title
+    font-size: ab.$text-xl
+    font-weight: 600
+    color: ab.$neutral-800
+
+.event
+    @include ab.flex($direction: column, $gap: ab.$space-3)
+    width: 100%
+    padding: ab.$space-4
+    border-radius: ab.$rounded-md
+    background-color: ab.$neutral-100
+    border: 1px solid ab.$neutral-300
+
+.event-title, .event-time, .event-days
+    @include ab.flex($direction: column, $gap: ab.$space-1)
+    font-size: ab.$text-lg
+
+.no-events
+    font-size: ab.$text-lg
+    color: ab.$neutral-800

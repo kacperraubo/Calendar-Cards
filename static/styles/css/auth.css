@@ -1,0 +1,139 @@
+.pointer {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.not-allowed {
+  cursor: not-allowed !important;
+}
+
+.hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 5.5fr 4.5fr;
+  grid-template-rows: 1fr;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: no-wrap;
+}
+.form-container .title {
+  font-size: 1.25rem;
+  color: #232B3C;
+  font-weight: 600;
+}
+.form-container form {
+  width: min(500px, 80%);
+}
+.form-container form .submit-button {
+  margin-top: 1.5rem;
+}
+.form-container .footer {
+  display: none;
+  color: #278BFF;
+}
+.form-container .footer .footer-link {
+  color: #005ECB;
+  font-weight: bold;
+}
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex-wrap: no-wrap;
+  background-color: #278BFF;
+  color: #F0F2F5;
+  padding: 2rem;
+}
+.welcome-container .time-zone {
+  font-weight: 300;
+}
+.welcome-container .year {
+  margin-top: 2.5rem;
+  font-weight: 500;
+}
+.welcome-container .month {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.welcome-container .day {
+  font-weight: 700;
+  font-size: 10rem;
+}
+.welcome-container .week-day {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-top: -1rem;
+}
+.welcome-container .divider {
+  width: 85%;
+  height: 1px;
+  background-color: #F0F2F5;
+  margin: 2rem 0;
+}
+.welcome-container .welcome-text {
+  font-size: 5.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+.welcome-container .already-have-account, .welcome-container .dont-have-account {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: no-wrap;
+  margin-top: 2rem;
+}
+.welcome-container .already-have-account .button, .welcome-container .dont-have-account .button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  border: 1px solid #F0F2F5;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 1300px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+  }
+
+  .form-container .footer {
+    display: block;
+  }
+
+  .welcome-container {
+    display: none;
+  }
+}
+
+/*# sourceMappingURL=auth.css.map */

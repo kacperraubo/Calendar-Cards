@@ -1,0 +1,129 @@
+{% load icons %}
+
+<div class="header">
+    <div class="hamburger">
+        {% icon 'menu' 'icon' %}    
+
+        {% if section %}
+            {% url 'home' section.token as section_url %}
+        {% else %}
+            {% url 'home' as section_url %}
+        {% endif %}
+
+        <a href="{{ section_url }}?{% if display_mode %}display-mode={{ display_mode }}&{% endif %}{% if start_date %}start_date={{ start_date|date:'Y-m' }}{% endif %}">
+            <div class="title">
+                My Calendar
+            </div>
+        </a>
+        
+        <div class="menu hidden">
+            {% if not exclude_add_section_button or not section %}
+                <button class="option add-section-button">
+                    Add Section
+                    {% icon 'plus' 'icon' %}
+                </button>
+            {% endif %}
+
+            {% if not exclude_rename_section_button %}
+                <button class="option rename-section-button">
+                    Rename Section
+                    {% icon 'edit' 'icon' %}
+                </button>
+            {% endif %}
+
+            {% if not exclude_delete_section_button %}
+                <button class="option delete-section-button">
+                    Delete Section
+                    {% icon 'trash' 'icon' %}
+                </button>
+            {% endif %}
+
+            {% if link_to_section and section.availabilities.count > 0 %}
+                <button 
+                    class="option link-to-section-button"
+                    data-link="{% url 'external_section' section.token %}"
+                >
+                    Copy link to section
+                    {% icon 'link' 'icon' %}
+                </button>
+
+                <script type="module">
+                    const linkToSectionButton = document.querySelector('.link-to-section-button');
+
+                    linkToSectionButton.addEventListener('click', () => {
+                        navigator.clipboard.writeText(window.location.origin + linkToSectionButton.dataset.link);
+                        alert('Link copied to clipboard!');
+                    });
+                </script>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout_view' %}">
+                    <button class="option logout-button">
+                        Logout
+                        {% icon 'log-out' 'icon' %}
+                    </button>
+                </a>
+            {% else %}
+                <a href="{% url 'sign_in' %}">
+                    <button class="option login-button">
+                        Login
+                        {% icon 'log-in' 'icon' %}
+                    </button>
+                </a>
+            {% endif %}
+        </div>
+
+        <script type="module">
+            const openIcon = document.querySelector('.hamburger > .icon');
+            const menu = document.querySelector('.menu');
+            
+            openIcon.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        </script>
+    </div>
+
+    {% if start_date %}
+        <div class="options">
+            <div class="display-modes">
+                <div class="single {% if display_mode == 'single' %}selected{% endif %}">
+                    <div class="rect"></div>
+                </div>
+                <div class="multi {% if display_mode == 'multi' %}selected{% endif %}">
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                </div>
+                <div class="year {% if display_mode == 'year' %}selected{% endif %}">
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                    <div class="rect"></div>
+                </div>
+            </div>
+            <div class="date">
+                <div class="year">
+                    {{ start_date|date:"Y" }}
+                </div>
+                <div class="month">
+                    {{ start_date|date:"F" }}
+                </div>
+                <div class="move">
+                    <button class="previous-month-button">
+                        {% icon 'chevron-up' 'icon' %}
+                    </button>
+                    <button class="next-month-button">
+                        {% icon 'chevron-down' 'icon' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

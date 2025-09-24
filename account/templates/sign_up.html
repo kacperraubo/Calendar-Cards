@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="form-container">
+            <p class="title">Sign Up</p>
+
+            <form action="{% url 'sign_up' %}" method="post">
+                {% csrf_token %}
+                {% include 'forms/base.html' with form=form %}
+                <button type="submit" class="submit-button rounded">Sign Up</button>
+            </form>
+
+            <div class="footer">
+                <span class="footer-text">Already have an account?</span>
+                <a href="{% url 'sign_in' %}" class="footer-link">Sign In</a>
+            </div>
+        </div>
+        <div class="welcome-container">
+            <span class="time-zone"></span>
+            <span class="year"></span>
+            <span class="month"></span>
+            <span class="day"></span>
+            <span class="week-day"></span>
+            
+            <div class="divider"></div>
+
+            <span class="welcome-text">Welcome to Calendar Cards</span>
+            <div class="already-have-account">
+                <a href="{% url 'sign_in' %}">Already have an account?</a>
+                <a class="button" href="{% url 'sign_in' %}">Sign In</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module">
+        import { localTimeZoneName } from '/static/scripts/utilities/date.js';
+
+        const timeZoneSelect = document.querySelector('[name="timezone"]');
+        const timeZoneOptions = timeZoneSelect.querySelectorAll('option');
+
+        timeZoneOptions.forEach(option => {
+            if (option.value === localTimeZoneName) {
+                option.selected = true;
+            }
+        });
+    </script>
+    <script type="module">
+        import { getFormattedTimeZone, dateParts } from '/static/scripts/utilities/date.js';
+
+        const { fullYear, monthName, day, weekday } = dateParts(new Date());
+        
+        document.querySelector(
+            '.welcome-container .time-zone'
+        ).textContent = getFormattedTimeZone();
+
+        document.querySelector(
+            '.welcome-container .year'
+        ).textContent = fullYear;
+
+        document.querySelector(
+            '.welcome-container .month'
+        ).textContent = monthName;
+
+        document.querySelector(
+            '.welcome-container .day'
+        ).textContent = day;
+
+        document.querySelector(
+            '.welcome-container .week-day'
+        ).textContent = weekday;
+    </script>
+{% endblock %}

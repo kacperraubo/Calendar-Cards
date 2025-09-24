@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="display-mode" value="{{ display_mode }}">  
+    <input type="hidden" name="section-token" value="{{ section.token }}"> 
+
+    <div class="home-container">
+        {% include 'diary/header.html' with link_to_section=True %}
+        {% include 'diary/mobile_month_navigation.html' %}
+        {% include 'diary/sections.html' %}
+
+        {% if display_mode == 'single' %}
+            <div class="single-mode">
+                <div class="day-label">Mon</div>
+                <div class="day-label">Tue</div>
+                <div class="day-label">Wed</div>
+                <div class="day-label">Thu</div>
+                <div class="day-label">Fri</div>
+                <div class="day-label weekend">Sat</div>
+                <div class="day-label weekend">Sun</div>
+
+                {% for day in days %}
+                    {% include 'diary/day_tile.html' with expanded=True day=day %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="{% if display_mode == 'multi' %}multi-mode{% else %}year-mode{% endif %}">
+                {% for month in months %}
+                    <div class="month">
+                        <div class="month-name">
+                            {{ month.name }}
+                        </div>
+                        
+                        <div class="month-grid">
+                            <div class="day-label">M</div>
+                            <div class="day-label">T</div>
+                            <div class="day-label">W</div>
+                            <div class="day-label">T</div>
+                            <div class="day-label">F</div>
+                            <div class="day-label weekend">S</div>
+                            <div class="day-label weekend">S</div>
+
+                            {% for day in month.days %}
+                                {% include 'diary/day_tile.html' with expanded=True day=day %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="upcoming-event">
+            <div class="tag">
+                {% icon 'bell' 'icon' %}
+                <span>
+                    {% if upcoming_event %}
+                        Upcoming event:
+                    {% else %}
+                        No upcoming events
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if upcoming_event %}
+                <div class="event">
+                    <a href="{% url 'edit_event' upcoming_event.token %}" class="date">
+                        {% if upcoming_event.starting_time %}
+                            {{ upcoming_event.starting_time|time:"h:i A" }}
+                            -
+                            {{ upcoming_event.ending_time|time:"h:i A" }}
+                        {% else %} 
+                            All day
+                        {% endif %}
+                    </a>
+                    <span class="divider-horizontal">-</span>
+                    <a href="{% url 'edit_event' upcoming_event.token %}" class="title">
+                        {{ upcoming_event.title }}
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if invitations|length > 0 %}
+                <div class="divider"></div>
+                <a href="{% url 'view_invitations' %}" class="invitations">
+                    ({{ invitations|length }}) Invitations
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="day-options hidden">
+            {% icon 'plus' 'icon' %}
+            <button class="add-event-button">Add event</button>
+            <span class="divider add-availability-divider">|</span>
+            <button class="add-availability-button">Availability</button>
+            <span class="divider view-divider">|</span>
+            <button class="view-button">View</button>
+
+            <div class="mobile-menu hidden">
+                <button class="view-button">View</button>
+                <button class="add-event-button">Add event</button>
+                <button class="add-availability-button">Availability</button>
+            </div>
+
+            <div class="intervals hidden">
+                {% for time_slot in time_slots %}
+                    <div 
+                        class="interval"
+                        data-start="{{ time_slot.start|time:'H:i' }}"
+                        data-start-display="{{ time_slot.start|time:'g:i A' }}"
+                        data-end="{{ time_slot.end|time:'H:i' }}"
+                        data-end-display="{{ time_slot.end|time:'g:i A' }}"
+                    >
+                        {{ time_slot.start|time:"g:i A" }} - {{ time_slot.end|time:"g:i A" }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <script type="module">
+                import { getInputValue } from '/static/scripts/utilities/inputs.js';
+                import { onDocumentLoad, onClickOutside, tick } from '/static/scripts/utilities/document.js';
+                import { addAvailabilityTimeSlot } from '/static/scripts/api/addAvailabilityTimeSlot.js';
+                import { removeAvailabilityTimeSlot } from '/static/scripts/api/removeAvailabilityTimeSlot.js';
+                import { clearAvailabilityTimeSlots } from '/static/scripts/api/clearAvailabilityTimeSlots.js';
+                import { getIcon } from '/static/scripts/utilities/icon.js';
+                import { isAnonymous } from '/static/scripts/utilities/userStatus.js';
+                
+                const section = getInputValue('section-token');
+
+                onDocumentLoad(async () => {
+                    const noAvailabilityIcon = await getIcon('clock', 'icon');
+                    const availabilityIcon = await getIcon('clock-filled', 'icon');
+
+                    const addAvailabilityButtons = document.querySelectorAll('.add-availability-button');
+                    const intervals = document.querySelector('.intervals');
+
+                    const close = () => {
+                        intervals.classList.add('hidden');
+                        intervals.querySelectorAll('.interval').forEach((interval) => {
+                            interval.classList.remove('selected');
+                        });
+                    }
+                    
+                    addAvailabilityButtons.forEach((addAvailabilityButton) => {
+                        addAvailabilityButton.addEventListener('click', async () => {
+                            const wasClosed = intervals.classList.contains('hidden');
+
+                            close();
+
+                            if (wasClosed) {
+                                intervals.classList.remove('hidden');
+                            }
+
+                            const selectedDays = document.querySelectorAll('.day.selected');
+
+                            if (selectedDays.length === 1) {
+                                const selectedDay = selectedDays[0];
+
+                                if (selectedDay.dataset.hasAvailability) {
+                                    const timeSlots = selectedDay.dataset.jsonifiedTimeSlots ? JSON.parse(selectedDay.dataset.jsonifiedTimeSlots) : [];
+
+                                    timeSlots.forEach((timeSlot) => {
+                                        const interval = intervals.querySelector(`.interval[data-start="${timeSlot.start}"][data-end="${timeSlot.end}"]`);
+
+                                        if (interval) {
+                                            interval.classList.add('selected');
+                                        }
+                                    });
+                                }
+                            } else {
+                                if (haveSameAvailability(...selectedDays)) {
+                                    const timeSlots = selectedDays[0].dataset.jsonifiedTimeSlots ? JSON.parse(selectedDays[0].dataset.jsonifiedTimeSlots) : [];
+
+                                    timeSlots.forEach((timeSlot) => {
+                                        const interval = intervals.querySelector(`.interval[data-start="${timeSlot.start}"][data-end="${timeSlot.end}"]`);
+
+                                        if (interval) {
+                                            interval.classList.add('selected');
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+                    const haveSameAvailability = (...days) => {
+                        if (days.length < 2) {
+                            return true;
+                        }
+
+                        const firstDay = days[0];
+                        const firstDayTimeSlots = firstDay.dataset.jsonifiedTimeSlots 
+                            ? JSON.parse(firstDay.dataset.jsonifiedTimeSlots) 
+                            : [];
+
+                        for (const day of days.splice(1)) {
+                            const timeSlots = day.dataset.jsonifiedTimeSlots 
+                                ? JSON.parse(day.dataset.jsonifiedTimeSlots) 
+                                : [];
+                            
+                            if (timeSlots.length !== firstDayTimeSlots.length) {
+                                return false;
+                            }
+
+                            for (const timeSlot of timeSlots) {
+                                if (!firstDayTimeSlots.find((firstDayTimeSlot) => {
+                                    return firstDayTimeSlot.start === timeSlot.start && firstDayTimeSlot.end === timeSlot.end;
+                                })) {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    intervals.querySelectorAll('.interval').forEach((interval) => {
+                        interval.addEventListener('click', async () => {
+                            if (isAnonymous) {
+                                alert('You must be logged in to add availability.');
+                                return;
+                            }
+
+                            const selectedDays = document.querySelectorAll('.day.selected');
+
+                            if (interval.classList.contains('selected')) {
+                                interval.classList.remove('selected');
+
+                                for (const selectedDay of selectedDays) {
+                                    const timeSlots = selectedDay.dataset.jsonifiedTimeSlots 
+                                        ? JSON.parse(selectedDay.dataset.jsonifiedTimeSlots) 
+                                        : [];
+
+                                    const token = timeSlots.find((timeSlot) => {
+                                        return timeSlot.start === interval.dataset.start && timeSlot.end === interval.dataset.end;
+                                    })?.token || null;
+
+                                    if (token) {
+                                        const { success, errorMessage } = await removeAvailabilityTimeSlot({ token });
+
+                                        if (success) {
+                                            const newTimeSlots = timeSlots.filter((timeSlot) => {
+                                                return timeSlot.start !== interval.dataset.start || timeSlot.end !== interval.dataset.end;
+                                            })
+
+                                            selectedDay.dataset.jsonifiedTimeSlots = JSON.stringify(newTimeSlots)
+
+                                            const iconContainer = selectedDay.querySelector('.availability');
+                                            iconContainer.innerHTML = '';   
+
+                                            if (newTimeSlots.length === 0) {
+                                                iconContainer.appendChild(noAvailabilityIcon.cloneNode(true));
+                                            } else {
+                                                iconContainer.appendChild(availabilityIcon.cloneNode(true));
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                const selectedDays = document.querySelectorAll('.day.selected');
+                                
+                                if (selectedDays.length > 1 && !haveSameAvailability(...selectedDays)) {
+                                    if (!confirm('This will overwrite the availability of the selected days. Are you sure you want to continue?')) {
+                                        return;
+                                    }
+
+                                    for (const selectedDay of selectedDays) {
+                                        const availabilityToken = selectedDay.dataset.availabilityToken;
+                                        const slots = selectedDay.dataset.jsonifiedTimeSlots 
+                                            ? JSON.parse(selectedDay.dataset.jsonifiedTimeSlots) 
+                                            : [];
+
+                                        if (availabilityToken && slots.length > 0) {
+                                            await clearAvailabilityTimeSlots({ token: availabilityToken });
+                                            selectedDay.removeAttribute('data-availability-token');
+                                            selectedDay.removeAttribute('data-jsonified-time-slots');
+                                            selectedDay.removeAttribute('data-has-availability');
+                                        }
+                                    }
+                                }
+
+                                for (const selectedDay of selectedDays) {
+                                    const existingTimeSlots = selectedDay.dataset.jsonifiedTimeSlots 
+                                        ? JSON.parse(selectedDay.dataset.jsonifiedTimeSlots) 
+                                        : [];
+
+                                    if (existingTimeSlots.find((timeSlot) => {
+                                        return timeSlot.start === interval.dataset.start && timeSlot.end === interval.dataset.end;
+                                    })) {
+                                        continue;
+                                    }
+
+                                    const { success, payload, errorMessage } = await addAvailabilityTimeSlot({
+                                        section,
+                                        date: selectedDay.dataset.date,
+                                        startTime: interval.dataset.start,
+                                        endTime: interval.dataset.end
+                                    });
+
+                                    if (success) {
+                                        existingTimeSlots.push(payload.slot);
+                                        selectedDay.dataset.jsonifiedTimeSlots = JSON.stringify(existingTimeSlots);
+                                        const iconContainer = selectedDay.querySelector('.availability');
+                                    
+                                        iconContainer.innerHTML = '';  
+                                        iconContainer.appendChild(availabilityIcon.cloneNode(true));
+                                    }
+                                }
+
+                                interval.classList.add('selected');
+                            }
+                        });
+                    });
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/home/index.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/day_details.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="date" value="{{ date|date:'Y-m-d' }}">
+    <input type="hidden" name="section-token" value="{{ section.token }}">
+
+    <div class="day-details-container">
+        {% include 'diary/header.html' with exclude_rename_section_button=True %}
+
+        <div class="day-details-wrapper">
+            <div class="single-mode">
+                <div class="day-label">Mon</div>
+                <div class="day-label">Tue</div>
+                <div class="day-label">Wed</div>
+                <div class="day-label">Thu</div>
+                <div class="day-label">Fri</div>
+                <div class="day-label weekend">Sat</div>
+                <div class="day-label weekend">Sun</div>
+    
+                {% for day in days %}
+                    {% include 'diary/day_tile.html' with expanded=False day=day exclude_availability=True %}
+                {% endfor %}
+            </div>
+            <div class="day-details">
+                <div class="date-label">
+                    {{ date|date:"l, j F Y" }}
+                </div>
+                {% if events %}
+                    <div class="events">
+                        <div class="section-title">
+                            Events
+                        </div>
+    
+                        {% for event in events %}
+                            <a href="{% url 'edit_event' event.token %}">
+                                <div class="event">
+                                    <div class="event-title">
+                                        <div class="label">
+                                            Title
+                                        </div>
+                                        {{ event.title }}
+                                    </div>
+                                    <div class="event-time">
+                                        <div class="label">
+                                            Time
+                                        </div>
+                                        {% if event.starting_time %}
+                                            {{ event.starting_time|time:"h:i A" }}
+                                            -
+                                            {{ event.ending_time|time:"h:i A" }}
+                                        {% else %}
+                                            All day
+                                        {% endif %}
+                                    </div>
+                                    <div class="event-days">
+                                        <div class="label">
+                                            Days
+                                        </div>
+                                        {% for date in event.dates %}
+                                            {{ date|date:"d M Y" }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-events">
+                        No events for this day
+                    </div>
+                {% endif %}
+    
+                {% if invitations %}
+                    <div class="invitations">
+                        <div class="section-title">
+                            Accepted Invitations
+                        </div>
+    
+                        {% for invitation in invitations %}
+                            <a href="{% url 'edit_accepted_invitation' invitation.token %}">
+                                <div class="event">
+                                    <div class="event-title">
+                                        <div class="label">
+                                            Title
+                                        </div>
+                                        {{ invitation.event.title }}
+                                    </div>
+                                    <div class="event-time">
+                                        {% if invitation.event.starting_time %}
+                                            {{ invitation.event.starting_time|time:"h:i A" }}
+                                            -
+                                            {{ invitation.event.ending_time|time:"h:i A" }}
+                                        {% else %}
+                                            All day
+                                        {% endif %}
+                                    </div>
+                                    <div class="event-dates">
+                                        <div class="label">
+                                            Dates
+                                        </div>
+                                        {% for date in invitation.event.dates %}
+                                            {{ date|date:"d M Y" }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-events">
+                        No accepted invitations for this day
+                    </div>
+                {% endif %}
+
+                {% if availability %}
+                    <div class="availability">
+                        <div class="section-title">
+                            Availability
+                        </div>
+
+                        {% for adjacent_slots in availability.adjacent_time_slots %}
+                            <span>
+                                {% for slot in adjacent_slots %}
+                                    {% if forloop.first %}
+                                        {{ slot.start|time:"h:i A" }} -
+                                    {% endif %}
+                                    
+                                    {% if forloop.last %}
+                                        {{ slot.end|time:"h:i A" }}
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if availability_events %}
+                    <div class="availability-events">
+                        <div class="section-title">
+                            Availability Events
+                        </div>
+
+                        {% for event in availability_events %}
+                            <a href="{% url 'edit_availability_event' event.token %}">
+                                <div class="event">
+                                    <div class="event-title">
+                                        <div class="label">
+                                            Title
+                                        </div>
+
+                                        {{ event.title }}
+                                    </div>
+                                    <div class="event-time">
+                                        <div class="label">
+                                            Time
+                                        </div>
+
+                                        {{ event.start_time|time:"h:i A" }}
+                                            -
+                                        {{ event.end_time|time:"h:i A" }}
+                                    </div>
+                                </div>  
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-events">
+                        No availability events for this day
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/dayDetails/index.js' %}"></script>
+{% endblock %}

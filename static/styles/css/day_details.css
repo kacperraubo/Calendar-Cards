@@ -1,0 +1,140 @@
+.pointer {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.not-allowed {
+  cursor: not-allowed !important;
+}
+
+.hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.day-details-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #FBFCFF;
+  padding: 0 2rem 2rem 2rem;
+}
+.day-details-container a {
+  text-decoration: none;
+}
+
+.single-mode {
+  position: sticky;
+  top: 1rem;
+  left: 0;
+}
+
+.day-details-wrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 2rem;
+}
+.day-details-wrapper .day-details {
+  position: static;
+}
+@media screen and (max-width: 1300px) {
+  .day-details-wrapper {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media screen and (max-width: 750px) {
+  .day-details-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .day-details-wrapper .single-mode {
+    display: none;
+  }
+}
+
+.day-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: no-wrap;
+  position: sticky;
+  top: 1rem;
+  left: 0;
+}
+
+.date-label {
+  color: #232B3C;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.events, .invitations, .availability-events, .day-details .availability {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+}
+.events a, .invitations a, .availability-events a, .day-details .availability a {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #232B3C;
+}
+
+.event {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: no-wrap;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #F0F2F5;
+  border: 1px solid #CED4E1;
+}
+
+.event-title, .event-time, .event-days {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.25rem;
+  flex-wrap: no-wrap;
+  font-size: 1.125rem;
+}
+
+.no-events {
+  font-size: 1.125rem;
+  color: #232B3C;
+}
+
+/*# sourceMappingURL=day_details.css.map */

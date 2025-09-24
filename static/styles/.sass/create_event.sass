@@ -1,0 +1,356 @@
+@use './abstracts' as ab
+@use './utils' as ut
+
+.create-event-container
+    width: 100%
+    background-color: ab.$neutral-50
+    padding: 0 ab.$space-8 ab.$space-8 ab.$space-8
+    overflow: hidden
+
+.event-container
+    display: grid
+    grid-template-columns: 3fr 7fr
+
+    .form-container
+        @include ab.hidden-scrollbar
+        position: sticky
+        top: ab.$space-4
+        left: 0
+        padding: ab.$space-6 ab.$space-12 ab.$space-12 ab.$space-4
+
+        .form
+            @include ab.flex($direction: column, $gap: ab.$space-4)
+
+            .title
+                font-weight: 600
+                font-size: ab.$text-2xl
+                color: ab.$neutral-700
+
+    @media screen and (max-width: 1300px)
+        grid-template-columns: 1fr 1fr
+
+    @media screen and (max-width: 750px)
+        grid-template-columns: 1fr
+
+        .selection-container
+            display: none
+
+.day-label
+    text-align: center
+    font-weight: 500
+    font-size: ab.$text-lg
+    color: ab.$neutral-700
+    padding: ab.$space-2 0
+
+    @media screen and (max-width: 1050px)
+        font-size: ab.$text-base
+
+.selection-container
+    overflow: hidden
+    padding: 0 2px
+
+.month-name
+    text-align: center
+    font-weight: 600
+    font-size: ab.$text-xl
+    color: ab.$neutral-800
+    padding: ab.$space-1 0
+
+.single-mode
+    width: 100%
+    display: grid
+    grid-template-columns: repeat(7, 1fr)
+    border-radius: 8px
+    gap: ab.$space-0_5
+
+.multi-mode, .year-mode
+    @include ab.hidden-scrollbar
+    max-width: 100%
+    display: flex
+    gap: ab.$space-6
+    overflow: auto
+
+    .month
+        flex: 1 0 100%
+        width: 100%
+        padding: 0 2px
+
+.month-grid
+    width: 100%
+    display: grid
+    grid-template-columns: repeat(7, 1fr)
+    gap: ab.$space-0_5
+
+    .month
+        flex: 1 0 100%
+        width: 100%
+        padding: 0 2px
+
+.day
+    @include ab.hidden-scrollbar
+    @include ab.flex($direction: column, $align: center, $gap: ab.$space-2)
+    outline: ab.$space-0_5 solid ab.$neutral-300
+    cursor: pointer
+    overflow: auto
+    padding: ab.$space-6
+    aspect-ratio: 1/1.25
+
+    .event-count
+        @include ab.flex($align: center, $justify: center)
+        display: none
+        width: ab.$space-6
+        height: ab.$space-6
+        border-radius: ab.$rounded-full
+        background-color: ab.$primary-300
+        color: ab.$neutral-100
+        font-size: ab.$text-sm
+
+        @media screen and (max-width: 1400px)
+            display: flex
+
+        @media screen and (max-width: 750px)
+            width: ab.$space-5
+            height: ab.$space-5
+            font-size: ab.$text-xs
+
+    .day-number
+        font-size: 6rem
+        font-weight: 350
+        color: ab.$neutral-600
+
+        @media screen and (max-width: 1450px)
+            font-size: 5rem
+
+        @media screen and (max-width: 1300px)
+            font-size: 4rem
+
+        @media screen and (max-width: 1000px)
+            font-size: 3rem
+
+        @media screen and (max-width: 750px)
+            font-size: 2rem
+
+        @media screen and (max-width: 580px)
+            font-size: 1.5rem
+
+        @media screen and (max-width: 470px)
+            font-size: 1rem
+
+    .availability
+        @include ab.flex($justify: safe center, $align: center, $gap: ab.$space-2)
+        width: 100%
+        height: fit-content
+        color: ab.$neutral-600
+        margin-bottom: ab.$space-3
+
+        span
+            white-space: nowrap
+
+            @media screen and (max-width: 1500px)
+                display: none
+
+        .icon
+            width: ab.$space-5
+            height: ab.$space-5
+            color: ab.$neutral-600
+
+    .event-marker
+        border-radius: ab.$rounded-full
+
+        &.finished
+            background-color: ab.$neutral-400
+
+        &.ongoing
+            background-color: ab.$primary-300
+
+        &.upcoming
+            background-color: ab.$neutral-600
+
+    .events
+        @include ab.hidden-scrollbar
+        @include ab.flex($direction: column, $gap: ab.$space-2)
+        width: 100%
+        max-height: 100%
+        overflow: auto
+
+        .event
+            @include ab.flex($align: center, $justify: space-between, $gap: ab.$space-2)
+            width: 100%
+            text-decoration: none
+
+            .event-time
+                width: 75%
+                font-size: ab.$text-sm
+                color: ab.$neutral-600
+                overflow: hidden
+                text-overflow: ellipsis
+                white-space: nowrap
+
+            .event-title
+                width: 25%
+                font-size: ab.$text-sm
+                color: ab.$neutral-700
+                font-weight: 600
+                overflow: hidden
+                text-overflow: ellipsis
+                white-space: nowrap
+                text-align: right
+
+            &.finished
+                .event-time
+                    color: ab.$neutral-400
+
+                .event-title
+                    color: ab.$neutral-400
+
+            &.ongoing
+                .event-time
+                    color: ab.$primary-300
+
+                .event-title
+                    color: ab.$primary-300
+
+            &.upcoming
+                .event-time
+                    color: ab.$neutral-600
+
+                .event-title
+                    color: ab.$neutral-600
+
+            @media screen and (max-width: 1400px)
+                display: none
+
+    .availability-preview
+        width: ab.$space-4
+        height: ab.$space-4
+        color: ab.$neutral-600
+
+    &.previous-month
+        .day-number
+            color: ab.$neutral-300
+
+    &.weekend
+        background-color: ab.$neutral-100
+
+    &.today
+        .day-number
+            color: ab.$primary-300
+
+    &.selected
+        outline-color: ab.$primary-300
+        background-color: transparentize(ab.$primary-100, 0.95)
+        z-index: 1
+
+    @media screen and (max-width: 1200px)
+        padding: ab.$space-3
+        gap: ab.$space-1
+
+    @media screen and (max-width: 900px)
+        padding: ab.$space-2
+
+        .availability
+            margin-bottom: ab.$space-2
+
+            .icon
+                width: ab.$space-4
+                height: ab.$space-4
+
+        .event-count
+            width: a
+            font-size: 0.6rem
+            width: ab.$space-4
+            height: ab.$space-4
+
+    @media screen and (max-width: 750px)
+        padding: ab.$space-1
+
+        .availability
+            margin-bottom: ab.$space-1
+
+            .icon
+                width: ab.$space-3
+                height: ab.$space-3
+
+    @media screen and (max-width: 580px)
+        aspect-ratio: 1/1.6
+        padding: ab.$space-2 ab.$space-2 0 ab.$space-2
+
+        .availability
+            margin-bottom: 0
+
+    @media screen and (max-width: 374px)
+        .event-count
+            width: ab.$space-2
+            height: ab.$space-2
+
+            .count
+                display: none
+
+.time-select
+    @include ab.flex($align: center, $gap: ab.$space-2, $justify: center)
+    width: 100%
+    position: relative
+    padding: ab.$space-3 ab.$space-4
+    border: 1px solid ab.$neutral-300
+    border-radius: ab.$rounded-sm
+    color: ab.$neutral-700
+    cursor: pointer
+    background-color: ab.$neutral-100
+
+    .icon
+        width: ab.$space-5
+        height: ab.$space-5
+
+    .intervals
+        @include ab.flex($direction: column, $align: center, $gap: ab.$space-2)
+        @include ab.hidden-scrollbar
+        width: 100%
+        max-height: ab.$space-64
+        background-color: ab.$neutral-100
+        overflow: auto
+        padding: ab.$space-2
+        border: 1px solid ab.$neutral-300
+        border-radius: ab.$rounded-sm
+        position: absolute
+        top: 110%
+        left: 0
+
+        .interval
+            @include ab.flex($align: center, $justify: center)
+            @include ab.transition-all
+            width: 100%
+            min-width: fit-content
+            padding: ab.$space-2
+            border: 1px solid ab.$neutral-300
+            border-radius: ab.$rounded-sm
+            white-space: nowrap
+
+            &.selected
+                border-color: ab.$primary-300
+
+            &.disabled
+                cursor: not-allowed
+                color: ab.$neutral-400
+
+        .divider
+            width: 100%
+            min-height: 1px
+            background-color: ab.$neutral-200
+
+.guest-list, .reminders-list
+    @include ab.flex($direction: column, $gap: ab.$space-4)
+    width: 100%
+    border: 1px solid ab.$neutral-300
+    border-radius: ab.$rounded-sm
+    background-color: ab.$neutral-100
+    padding: ab.$space-3
+
+    .guest, .reminder
+        @include ab.flex($align: center, $justify: space-between)
+        width: 100%
+        color: ab.$neutral-600
+
+        .icon
+            width: ab.$space-5
+            height: ab.$space-5
+            color: ab.$neutral-500

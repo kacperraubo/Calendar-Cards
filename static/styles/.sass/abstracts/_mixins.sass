@@ -1,0 +1,54 @@
+
+@mixin custom_screen_max($max)
+    @media ( max-width: $max )
+        @content
+
+@mixin custom_screen_min($min)
+    @media ( min-width: $min )
+        @content
+
+@mixin flex($direction: row, $justify: flex-start, $align: flex-start, $gap: 0, $wrap: no-wrap)
+    display: flex
+    flex-direction: $direction
+    justify-content: $justify
+    align-items: $align
+    gap: $gap
+    flex-wrap: $wrap
+
+@mixin transition-all
+    transition: all 0.3s ease
+
+@mixin transform-half-x-axis
+    left: 50%
+    transform: translateX(-50%)
+
+@mixin transform-half-y-axis
+    top: 50%
+    transform: translateY(-50%)
+
+@mixin transform-center
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
+
+@mixin hidden-scrollbar
+    scrollbar-width: none
+    -ms-overflow-style: none
+
+    &::-webkit-scrollbar
+        display: none
+
+@mixin thin-scrollbar
+    scrollbar-width: thin
+    -ms-overflow-style: thin
+
+    &::-webkit-scrollbar
+        width: 5px
+
+@mixin tablet
+    @include custom_screen_max(1024px)
+        @content
+
+@mixin mobile
+    @include custom_screen_max(768px)
+        @content

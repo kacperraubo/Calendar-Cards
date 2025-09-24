@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load icons %}
+{% load define %}
+
+{% block meta %}
+    {% autoescape off %}
+        {{ meta_tags }}
+    {% endautoescape %}
+{% endblock %}
+
+{% block refs %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/css/create_event.css' %}">
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="availability-token" value="{{ availability.token }}">
+
+    <div class="create-event-container">
+        {% include 'diary/header.html' with exclude_delete_section_button=True exclude_rename_section_button=True %}
+
+        <div class="event-container">
+            <div class="form-container">
+                <div class="form">
+                    <div class="title">Create Event</div>
+
+                    {% if not user.is_authenticated %}
+                        <div 
+                            class="input-container input-text"
+                            data-input-name="email"
+                        >
+                            <div class="label">
+                                <label for="email">Your Email</label>
+                                <span class="required">*</span>
+                            </div>
+
+                            <div class="input">
+                                <input 
+                                    type="text"
+                                    name="email" 
+                                    id="email"
+                                    placeholder="Enter your email"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="title"
+                    >
+                        <div class="label">
+                            <label for="title">Title</label>
+                            <span class="required">*</span>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="title" 
+                                id="title"
+                                placeholder="Enter event title" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="description"
+                    >
+                        <div class="label">
+                            <label for="description">Description</label>
+                        </div>
+
+                        <div class="input">
+                            <textarea 
+                                name="description" 
+                                id="description"
+                                placeholder="Enter event description" 
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <div 
+                        class="input-container input-text"
+                        data-input-name="address"
+                    >
+                        <div class="label">
+                            <label for="address">Address</label>
+                        </div>
+
+                        <div class="input">
+                            <input 
+                                type="text"
+                                name="address" 
+                                id="address"
+                                placeholder="Enter address" 
+                            >
+                        </div>
+                    </div>
+
+                    <div class="label">
+                        Time
+                    </div>
+
+                    <div class="time-select">
+                        <div class="from">None</div>
+                        <div class="divider">-</div>
+                        <div class="to">None</div>
+                        {% icon 'clock' 'icon' %}
+
+                        <div class="intervals hidden">
+                            {% for adjacent_slots in availability.adjacent_available_time_slots %}
+                                {% for time_slot in adjacent_slots %}
+                                    <div 
+                                        class="interval"
+                                        data-start="{{ time_slot.start|time:'H:i' }}"
+                                        data-start-display="{{ time_slot.start|time:'g:i A' }}"
+                                        data-end="{{ time_slot.end|time:'H:i' }}"
+                                        data-end-display="{{ time_slot.end|time:'g:i A' }}"
+                                    >   
+                                        <span>
+                                            {{ time_slot.start|time:"g:i A" }}
+                                        </span>
+                                        <span>&nbsp;-&nbsp;</span>
+                                        <span>
+                                            {{ time_slot.end|time:"g:i A" }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+
+                                {% if not forloop.last %}
+                                    <div class="divider"></div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="start-time" value="">
+                    <input type="hidden" name="end-time" value="">
+
+                    <script type="module">
+                        import { onDocumentLoad, onClickOutside, tick } from '/static/scripts/utilities/document.js';
+
+                        onDocumentLoad(() => {
+                            const timeSelect = document.querySelector('.time-select');
+                            const intervals = timeSelect.querySelector('.intervals');
+                            const fromDisplay = timeSelect.querySelector('.from');
+                            const toDisplay = timeSelect.querySelector('.to');
+                            const startTimeInput = document.querySelector('input[name="start-time"]');
+                            const endTimeInput = document.querySelector('input[name="end-time"]');
+
+                            let clickOutsideHandler = null;
+
+                            timeSelect.addEventListener('click', async (e) => {
+                                if (intervals.contains(e.target)) {
+                                    return;
+                                }
+
+                                const isHidden = intervals.classList.contains('hidden');
+                                
+                                if (isHidden) {
+                                    intervals.classList.remove('hidden');
+                                    await tick();
+                                    
+                                    clickOutsideHandler = onClickOutside(intervals, () => {
+                                        intervals.classList.add('hidden');
+
+                                        if (clickOutsideHandler) {
+                                            document.removeEventListener('click', clickOutsideHandler);
+                                            clickOutsideHandler = null;
+                                        }
+                                    });
+                                } else {
+                                    intervals.classList.add('hidden');
+
+                                    if (clickOutsideHandler) {
+                                        document.removeEventListener('click', clickOutsideHandler);
+                                        clickOutsideHandler = null;
+                                    }
+                                }
+                            });
+
+                            const intervalElements = intervals.querySelectorAll('.interval');
+                            let startInterval = null;
+                            let endInterval = null;
+
+                            const resetSelection = () => {
+                                intervalElements.forEach(interval => interval.classList.remove('selected'));
+                                startInterval = null;
+                                endInterval = null;
+                                fromDisplay.textContent = 'None';
+                                toDisplay.textContent = 'None';
+                                startTimeInput.value = '';
+                                endTimeInput.value = '';
+                            };
+
+                            const getElementIndex = (element) => {
+                                return Array.from(element.parentElement.children).indexOf(element);
+                            };
+
+                            const getIntervalsBetween = (intervalA, intervalB) => {
+                                const selectedIntervals = [];
+                                const indexA = getElementIndex(intervalA);
+                                const indexB = getElementIndex(intervalB);
+                                
+                                const [startEl, endEl] = indexA <= indexB ? [intervalA, intervalB] : [intervalB, intervalA];
+                                
+                                let current = startEl;
+                                
+                                while (current && current !== endEl.nextElementSibling) {
+                                    if (current.classList.contains('divider')) {
+                                        return null;
+                                    }
+                                    if (current.classList.contains('interval')) {
+                                        selectedIntervals.push(current);
+                                    }
+                                    current = current.nextElementSibling;
+                                }
+                                
+                                return selectedIntervals;
+                            };
+
+                            const updateDisplay = (start, end) => {
+                                fromDisplay.textContent = start.dataset.startDisplay;
+                                toDisplay.textContent = end.dataset.endDisplay;
+                                startTimeInput.value = start.dataset.start;
+                                endTimeInput.value = end.dataset.end;
+                            };
+
+                            intervalElements.forEach(interval => {
+                                interval.addEventListener('click', () => {
+                                    if (!startInterval) {
+                                        startInterval = interval;
+                                        endInterval = interval;
+                                        interval.classList.add('selected');
+                                        updateDisplay(interval, interval);
+
+                                        return;
+                                    }
+
+                                    if (interval === startInterval) {
+                                        resetSelection();
+
+                                        return;
+                                    }
+
+                                    if (interval === endInterval && endInterval !== startInterval) {
+                                        const newEnd = endInterval.previousElementSibling;
+                                        
+                                        if (newEnd && newEnd.classList.contains('interval')) {
+                                            endInterval = newEnd;
+                                            endInterval.nextElementSibling.classList.remove('selected');
+                                            updateDisplay(startInterval, endInterval);
+                                        }
+
+                                        return;
+                                    }
+
+                                    const clickedIndex = getElementIndex(interval);
+                                    const startIndex = getElementIndex(startInterval);
+                                    
+                                    const selectedIntervals = getIntervalsBetween(interval, startInterval);
+                                    
+                                    if (!selectedIntervals) {
+                                        alert('You cannot select time slots across non-contiguous availability slots.');
+                                        return;
+                                    }
+
+                                    intervalElements.forEach(int => int.classList.remove('selected'));
+                                    
+                                    selectedIntervals.forEach(int => int.classList.add('selected'));
+                                    
+                                    if (clickedIndex < startIndex) {
+                                        startInterval = interval;
+                                    } else {
+                                        endInterval = interval;
+                                    }
+                                    
+                                    updateDisplay(startInterval, endInterval);
+                                });
+                            });
+                        });
+                    </script>
+
+                    <button class="submit-button create-event-button">
+                        Create
+                    </button>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                <div class="single-mode">
+                    <div class="day-label">Mon</div>
+                    <div class="day-label">Tue</div>
+                    <div class="day-label">Wed</div>
+                    <div class="day-label">Thu</div>
+                    <div class="day-label">Fri</div>
+                    <div class="day-label weekend">Sat</div>
+                    <div class="day-label weekend">Sun</div>
+    
+                    {% for day in days %}
+                        {% include 'diary/day_tile.html' with expanded=False day=day exclude_sensitive_data=True %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'scripts/externalAvailability/index.js' %}"></script>
+{% endblock %}

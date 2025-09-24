@@ -1,0 +1,154 @@
+@use '../abstracts' as ab
+@use '../utils' as ut
+
+.header
+    @include ab.flex($justify: space-between, $align: center)
+    padding: ab.$space-4 0
+    white-space: nowrap
+    height: ab.$space-20
+
+    a
+        text-decoration: none
+
+    .hamburger
+        @include ab.flex($align: center, $gap: ab.$space-2)
+        position: relative
+        cursor: pointer
+        color: ab.$neutral-700
+        z-index: 2
+
+        .menu
+            position: absolute
+            top: 150%
+            left: 0
+            background-color: ab.$neutral-50
+            border: 1px solid ab.$neutral-300
+            border-radius: ab.$rounded-sm
+            padding: ab.$space-2
+
+            .option
+                @include ab.flex($justify: space-between, $align: center, $gap: ab.$space-2)
+                padding: ab.$space-1
+                color: ab.$neutral-600
+                cursor: pointer
+                padding: ab.$space-2
+                width: 100%
+
+                .icon
+                    width: ab.$space-5
+                    height: ab.$space-5
+
+                &:hover
+                    background-color: ab.$neutral-100
+
+    .options
+        @include ab.flex($align: center, $gap: ab.$space-4)
+
+    .display-modes
+        @include ab.flex($align: center, $gap: ab.$space-4)
+
+        .single, .multi, .year
+            cursor: pointer
+            display: grid
+            gap: ab.$space-0_5
+            aspect-ratio: 1
+            height: ab.$space-4_5
+
+            .rect
+                background-color: ab.$primary-100
+                border-radius: 2px
+
+            &.selected
+                height: ab.$space-7
+
+                .rect
+                    background-color: ab.$primary-300
+
+        .single
+            grid-template-rows: 1fr
+            grid-template-columns: 1fr
+
+        .multi
+            grid-template-rows: 1fr 1fr
+            grid-template-columns: 1fr 1fr
+
+        .year
+            grid-template-rows: 1fr 1fr 1fr
+            grid-template-columns: 1fr 1fr 1fr
+
+    .date
+        @include ab.flex($align: center, $gap: ab.$space-2)
+
+        .year, .month
+            color: ab.$neutral-700
+
+        .month
+            font-weight: 600
+            font-size: ab.$text-lg
+
+        .year
+            font-size: ab.$text-sm
+            margin-top: ab.$space-0_5
+
+        .move
+            @include ab.flex($direction: column, $align: center)
+
+            button
+                @include ab.transition-all
+                @include ab.flex($align: center, $justify: center)
+                height: ab.$space-6
+                width: ab.$space-6
+                border-radius: ab.$rounded-sm
+                background-color: transparent
+
+                &:hover
+                    background-color: ab.$neutral-100
+
+            .icon
+                color: ab.$neutral-600
+
+        @media screen and (max-width: 750px)
+            display: none
+
+.mobile-month-navigation
+    display: none
+    width: 100%
+    color: ab.$neutral-700
+    padding-bottom: ab.$space-4
+
+    .icon
+        width: ab.$space-6
+        height: ab.$space-6
+        color: ab.$neutral-600
+
+    .month
+        font-weight: 600
+        font-size: ab.$text-lg
+        margin-bottom: ab.$space-1
+
+    .year
+        font-size: ab.$text-sm
+        margin-bottom: ab.$space-0_5
+
+    @media screen and (max-width: 750px)
+        @include ab.flex($align: center, $justify: center, $gap: ab.$space-2)
+
+.scroll-container
+    overflow: auto
+
+.sections
+    @include ab.hidden-scrollbar
+    @include ab.flex($gap: ab.$space-4)
+    width: fit-content
+    overflow: auto
+    color: ab.$neutral-600
+    padding-bottom: ab.$space-6
+    margin: 0 auto
+
+    .section
+        font-size: ab.$text-lg
+        white-space: nowrap
+
+        &.selected
+            color: ab.$neutral-800
+            font-weight: 600

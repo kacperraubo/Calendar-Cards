@@ -1,0 +1,9 @@
+{% autoescape off %}You have been invited to join an event by {{ event_owner_email }}!
+
+Event title: {{ event_title }}
+Event time: {% if event_starting_time %}{{ event_starting_time|time:"h:i A" }} - {{ event_ending_time|time:"h:i A" }}{% else %}All day{% endif %}
+Event dates: {{ event_dates }}
+{% if event_description %}Event description: {{ event_description }}{% endif %}
+
+You can view the event details here: {{ event_url }}
+{% endautoescape %}
